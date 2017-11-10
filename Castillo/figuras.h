@@ -18,9 +18,10 @@ class CFiguras
 	void cono(float altura, float radio, int resolucion, GLuint text);		//Funcíon creacion cono
 	void prisma_anun (GLuint text, GLuint text2);							//Funcíon creacion movimiento
 	void prisma (float altura, float largo, float profundidad, GLuint text);//Funcíon creacion prisma
+	void prismaparedes(float altura, float largo, float profundidad, GLuint text, float repeticiontext);
 	void prisma2 (GLuint text, GLuint text2);
-	void skybox(float altura, float largo, float profundidad, GLuint text);	//Funcion creacion cielo
-	
+	void skybox(float altura, float largo, float profundidad, GLuint text, float repeticion);	//Funcion creacion cielo
+	void skybox_casas(float altura, float largo, float profundidad, GLuint text, float repeticion);
 
 	//void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text );
 	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos);
