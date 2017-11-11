@@ -79,13 +79,13 @@ CTexture text1; //cielo1
 //Casa
 CTexture textPuerta_Casa;
 CTexture textWall;
+CTexture textPiso;
+CTexture textTechoCasa;
+//Interior casa
 CTexture textSilla;
 CTexture textMarble;
-CTexture textPiso;
 CTexture textCuadro1;
 CTexture textGrass;
-
-//***ROSE****
 CTexture textAlmohada;
 CTexture textColcha;
 CTexture textMaderaBuro;
@@ -102,12 +102,13 @@ CFiguras respaldoSilla1;
 CFiguras respaldoSilla2;
 CFiguras respaldoSilla3;
 CFiguras respaldoSilla4;
-//*****ROSE*****
-
 CFiguras cama;
 CFiguras buro;
 CFiguras cono;
 CFiguras cubo;
+
+//Exterior
+CFiguras pasto;
 
 //END NEW//////////////////////////////////////////
 
@@ -143,12 +144,20 @@ void DibujaCasa ( void ){
 
 }
 
-void dibujaParedesCasa() {
+void dibujaContornoCasa() {
+	//Paredes y piso de la casa
 	glPushMatrix();
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
 		glRotatef(-90, 0,1,0);
-		paredescasa.skybox(26, 30, 20, textWall.GLindex, 5.0);
-		//glTranslatef(0, 0, 10);
-		//paredf.prismaparedes(30.0, 26.0, 1.0, textWall.GLindex, 5.0);
+		paredescasa.skybox_casa(26, 30, 30, textWall.GLindex, textPiso.GLindex, textPuerta_Casa.GLindex, textTechoCasa.GLindex, 1.0f, 8.0f, 3.0f);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+
+	//Techo de la casa
+	glPushMatrix();
+		glTranslatef(0, 16.5, 0);
+		cubo.prisma_tablero(4, 35, 35, textTechoCasa.GLindex, 3.0 );
 	glPopMatrix();
  }
 
@@ -165,8 +174,8 @@ void mesa(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosMesa, G
 			//patas
 			glPopMatrix();
 			glPushMatrix();
-				glTranslatef(4, -2.75, 2);
-				glScalef( .5,5,.5);
+				glTranslatef(4, -2.5, 2);
+				glScalef( .5, 4.5,.5);
 				pata1Mesa.prisma (1.0, 1.0, 1.0, textMarble.GLindex);
 				glTranslatef(0, 0, -8);
 				pata2Mesa.prisma (1.0, 1.0, 1.0, textMarble.GLindex);
@@ -267,7 +276,8 @@ void cuadro(void){
 	glPushMatrix();
 		glScalef(1,1,-1);
 		glTranslatef(-19,30,-42);
-		cubo.prisma(16,15,.2, textCuadro1.GLindex);
+		glRotatef(90, 0, 0, 1);
+		cubo.prisma(24,40,.2, textCuadro1.GLindex);
 		glTranslatef(0,0,-.05);
 	glPopMatrix();
 	return;
@@ -343,29 +353,10 @@ void dibujaCama (GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPos
 				cama.prisma(1.0,1.0,1.0, textMaderaCama.GLindex);
 			glPopMatrix();
 
-			glPushMatrix(); 
-				glTranslatef(9.0,1.0,21.5);
-				glScalef(18.0,2.0,1.0);
-				cama.prisma(1.0,1.0,1.0, textMaderaCama.GLindex);
-			glPopMatrix();
-
-
 			//colchon
 			glPushMatrix(); 
 				glTranslatef(9.0,3.5,11.0);
 				glScalef(18.0,3.0,20.0);
-				cama.prisma(1.0,1.0,1.0, textColcha.GLindex);
-			glPopMatrix();
-
-			glPushMatrix(); 
-				glTranslatef(0.5,3.5,11.0);
-				glScalef(1.0,3.0,20.0);
-				cama.prisma(1.0,1.0,1.0, textColcha.GLindex);
-			glPopMatrix();
-
-			glPushMatrix(); 
-				glTranslatef(17.5,3.5,11.0);
-				glScalef(1.0,3.0,20.0);
 				cama.prisma(1.0,1.0,1.0, textColcha.GLindex);
 			glPopMatrix();
 
@@ -614,11 +605,11 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	text1.ReleaseImage();
 
 	//NEW////////////////////////////////////////////
-	textPuerta_Casa.LoadBMP("casa/puerta_casa.bmp");
+	textPuerta_Casa.LoadBMP("casa/door_3.bmp");
 	textPuerta_Casa.BuildGLTexture();
 	textPuerta_Casa.ReleaseImage();
 
-	textWall.LoadBMP("casa/brick_2.bmp");
+	textWall.LoadBMP("casa/pared_vieja.bmp");
 	textWall.BuildGLTexture();
 	textWall.ReleaseImage();
 
@@ -634,11 +625,15 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textPiso.BuildGLTexture();
 	textPiso.ReleaseImage();
 
-	textCuadro1.LoadBMP("casa/cuadro_1.bmp");
+	textTechoCasa.LoadBMP("casa/tejado.bmp");
+	textTechoCasa.BuildGLTexture();
+	textTechoCasa.ReleaseImage();
+	
+	textCuadro1.LoadBMP("casa/zamoxdxd.bmp");
 	textCuadro1.BuildGLTexture();
 	textCuadro1.ReleaseImage();
 
-	textGrass.LoadBMP("casa/grass_2.bmp");
+	textGrass.LoadTGA("texturas/pasto.tga");
 	textGrass.BuildGLTexture();
 	textGrass.ReleaseImage();
 	
@@ -661,7 +656,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//END NEW//////////////////////////////
 
-	objCamera.Position_Camera(-10,-12.0f,-5, -10,-12.0f,0, 0, 1, 0); //Posision incial de la camara
+	objCamera.Position_Camera(-6, 6.0f,-5, -6, 6.0f,0, 0, 1, 0); //Posision inicial de la camara
 
 	//NEW Iniciar variables de KeyFrames
 	for(int i=0; i<MAX_FRAMES; i++)
@@ -694,7 +689,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
-	glPushMatrix();
+	glPushMatrix(); //Push inicial
 	
 
 	glRotatef(g_lookupdown,1.0f,0,0);
@@ -708,62 +703,71 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 			glPushMatrix(); //Creamos cielo
 				glDisable(GL_LIGHTING);
-				glTranslatef(0,800,0);
-				fig1.skybox(1600.0, 1600.0, 1600.0,text1.GLindex,1.0);
+					glTranslatef(0,800,0);
+					fig1.skybox(1600.0, 1600.0, 1600.0,text1.GLindex,1.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();		
 
+			///////PASTO////////////
+			glPushMatrix();
+				glDisable(GL_LIGHTING);
+					pasto.prisma_tablero(0.1, 100, 100, textGrass.GLindex, 20.0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
 
 			//CASA///////////////////
-			//*****Paredes *****
-			glPushMatrix();
-				glDisable(GL_LIGHTING);
-				glScalef(1.0, 0.5, 1.0);
-				glTranslatef(-7.7, -15.5, -3);
-				dibujaParedesCasa();
-			glPopMatrix();
-			//¨****Interior casa*****
-			glPushMatrix();
-				glScalef(1.0, 0.5, 1.0);
-				glTranslatef(-5, -27.5, -3);
-				//glRotatef(180, 0, 1, 0);
-				glDisable(GL_LIGHTING);
-				glScalef(0.3, 0.3, 0.3);
-			
+			glPushMatrix(); //Casa completa
+				glTranslatef(0, 7.7, 0);
+				//*****Paredes, Piso y Techo *****
 				glPushMatrix();
-					//****cuadros***			
-					cuadro();
-					//****COMEDOR***
-					glPushMatrix();
-						glTranslatef(-20,0,25);
-						glScalef(1.3,1.3,1.3);
-						comedor();
-					glPopMatrix();
-
-					//*****ROSE*****
-					glPushMatrix(); 
-						glPushMatrix();
-							glTranslatef(0,0,-0.5); 
-							glRotatef(90, 0,1,0); 
-							glTranslatef(2,0,-0.5);
-							dibujaCama(1.1,1.1,1.1,14.0,-5.5,-37.0); 
-						glPopMatrix();
-						glPushMatrix();
-							glRotatef(90, 0,1,0); 
-							dibujaBuro(1,1,1,-2,-9.5,-42.0); 
-						glPopMatrix();
-					glPopMatrix();
-
+					glDisable(GL_LIGHTING);
+					glScalef(1.0, 0.5, 1.0);
+					dibujaContornoCasa();
 				glPopMatrix();
+				//¨****Interior casa*****
+				glPushMatrix();
+					glScalef(1.0, 0.5, 1.0);
+					glTranslatef(-2.3, -12, 0.2);
+					//glRotatef(180, 0, 1, 0);
+					glDisable(GL_LIGHTING);
+					glScalef(0.3, 0.3, 0.3);
+			
+					glPushMatrix();
+						//****cuadros***			
+						cuadro();
+						//****COMEDOR***
+						glPushMatrix();
+							glTranslatef(-20,0,25);
+							glScalef(1.3,1.3,1.3);
+							comedor();
+						glPopMatrix();
 
-			glEnable(GL_LIGHTING);
-			glPopMatrix();
-					
+						//*****ROSE*****
+						glPushMatrix(); 
+							glPushMatrix();
+								glTranslatef(0,0,-0.5); 
+								glRotatef(90, 0,1,0); 
+								glTranslatef(2,-0.5,-0.5);
+								dibujaCama(1.1,1.1,1.1,14.0,-5.5,-37.0); 
+							glPopMatrix();
+							glPushMatrix();
+								glRotatef(90, 0,1,0); 
+								dibujaBuro(1,1,1,-2,-9.5,-42.0); 
+							glPopMatrix();
+						glPopMatrix();
+
+					glPopMatrix();
+
+				glEnable(GL_LIGHTING);
+				glPopMatrix();
+			
+			glPopMatrix();// De interior casa
 
 			glColor3f(1.0,1.0,1.0);
 
-		glPopMatrix();
-	glPopMatrix();
+		glPopMatrix();// De casa entera
+
+	glPopMatrix(); //Pop final
 
 	glutSwapBuffers ( );
 
@@ -828,10 +832,13 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
+	//printf("%.2f \n", objCamera.mPos.x);
+	//printf("%.2f \n", objCamera.mPos.y);
+	//printf("%.2f \n", objCamera.mPos.z);
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
-			objCamera.Move_Camera( CAMERASPEED+0.2 );
+				objCamera.Move_Camera(CAMERASPEED + 0.2);
 			break;
 
 		case 's':
@@ -879,6 +886,9 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'y':						
 		case 'Y':
+			textPuerta_Casa.LoadTGA("texturas/vacio.tga");
+			textPuerta_Casa.BuildGLTexture();
+			textPuerta_Casa.ReleaseImage();
 			break;
 
 		case 'g':						
@@ -923,7 +933,8 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		objCamera.UpDown_Camera(-CAMERASPEED);
+		if (objCamera.mPos.y>3)
+			objCamera.UpDown_Camera(-CAMERASPEED);
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
@@ -996,7 +1007,7 @@ int main ( int argc, char** argv )   // Main Function
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
   glutInitWindowSize  (500, 500);	// Tamaño de la Ventana
   glutInitWindowPosition (0, 0);	//Posicion de la Ventana
-  glutCreateWindow    ("Practica 11"); // Nombre de la Ventana
+  glutCreateWindow    ("Proyecto Final"); // Nombre de la Ventana
   //glutFullScreen     ( );         // Full Screen
   InitGL ();						// Parametros iniciales de la aplicacion
   glutDisplayFunc     ( display );  //Indicamos a Glut función de dibujo
