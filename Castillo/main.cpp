@@ -90,7 +90,11 @@ CTexture textAlmohada;
 CTexture textColcha;
 CTexture textMaderaBuro;
 CTexture textMaderaCama;
-
+//Navidad
+CTexture textTroncoNavidad;
+CTexture textHojasNavidad;
+CTexture textRegalo;
+CTexture textRegaloFront;
 /////////////CFiguras interior de la casa/////////////////
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
@@ -104,11 +108,18 @@ CFiguras respaldoSilla3;
 CFiguras respaldoSilla4;
 CFiguras cama;
 CFiguras buro;
-CFiguras cono;
+//****Navidad***
+CFiguras hojasNavidad;
+CFiguras troncoNavidad;
+CFiguras regalo;
 CFiguras cubo;
 
 //Exterior
 CFiguras pasto;
+
+///////////////////FIGURAS EN 3D///////////////////
+//****Interior casa********
+CModel  Cup; //Taza de cafe
 
 //END NEW//////////////////////////////////////////
 
@@ -604,7 +615,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	text1.BuildGLTexture();
 	text1.ReleaseImage();
 
-	//NEW////////////////////////////////////////////
+	//Texturas casa////////////////////////////////////////////
 	textPuerta_Casa.LoadBMP("casa/door_3.bmp");
 	textPuerta_Casa.BuildGLTexture();
 	textPuerta_Casa.ReleaseImage();
@@ -617,7 +628,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textSilla.BuildGLTexture();
 	textSilla.ReleaseImage();
 
-	textMarble.LoadBMP("casa/marble_2.bmp");
+	textMarble.LoadBMP("casa/madera.bmp");
 	textMarble.BuildGLTexture();
 	textMarble.ReleaseImage();
 
@@ -629,7 +640,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textTechoCasa.BuildGLTexture();
 	textTechoCasa.ReleaseImage();
 	
-	textCuadro1.LoadBMP("casa/zamoxdxd.bmp");
+	textCuadro1.LoadBMP("casa/cuadro.bmp");
 	textCuadro1.BuildGLTexture();
 	textCuadro1.ReleaseImage();
 
@@ -637,7 +648,6 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textGrass.BuildGLTexture();
 	textGrass.ReleaseImage();
 	
-	//*****ROSE******
 	textAlmohada.LoadBMP("casa/almohada.bmp");
 	textAlmohada.BuildGLTexture();
 	textAlmohada.ReleaseImage();
@@ -654,7 +664,28 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textMaderaCama.BuildGLTexture();
 	textMaderaCama.ReleaseImage();
 
+	//***Navidad***
+	textTroncoNavidad.LoadBMP("casa/tronco_navidad.bmp");
+	textTroncoNavidad.BuildGLTexture();
+	textTroncoNavidad.ReleaseImage();
+
+	textHojasNavidad.LoadBMP("casa/hoja_pino.bmp");
+	textHojasNavidad.BuildGLTexture();
+	textHojasNavidad.ReleaseImage();
+
+	textRegalo.LoadBMP("casa/regalo.bmp");
+	textRegalo.BuildGLTexture();
+	textRegalo.ReleaseImage();
+
+	textRegaloFront.LoadBMP("casa/regaloFront.bmp");
+	textRegaloFront.BuildGLTexture();
+	textRegaloFront.ReleaseImage();
+
 	//END NEW//////////////////////////////
+
+	///////Modelos 3ds/////////
+	Cup._3dsLoad("modelos/Cup.3ds");
+
 
 	objCamera.Position_Camera(-6, 6.0f,-5, -6, 6.0f,0, 0, 1, 0); //Posision inicial de la camara
 
@@ -706,12 +737,16 @@ void display ( void )   // Creamos la funcion donde se dibuja
 					glTranslatef(0,800,0);
 					fig1.skybox(1600.0, 1600.0, 1600.0,text1.GLindex,1.0);
 				glEnable(GL_LIGHTING);
-			glPopMatrix();		
+			glPopMatrix();	
+
 
 			///////PASTO////////////
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
-					pasto.prisma_tablero(0.1, 100, 100, textGrass.GLindex, 20.0);
+				//glDisable(GL_COLOR_MATERIAL);
+				pasto.prisma_tablero(0.1, 100, 100, textGrass.GLindex, 20.0);
+				//Cup.GLrender(NULL, _SHADED, 1.0);
+				//glEnable(GL_COLOR_MATERIAL);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
@@ -756,16 +791,37 @@ void display ( void )   // Creamos la funcion donde se dibuja
 							glPopMatrix();
 						glPopMatrix();
 
-					glPopMatrix();
+						////***Navidad, arbol y regalos
+						glPushMatrix();
+						glTranslatef(10, 0, 0);
+							glPushMatrix();//Tronco
+								glTranslatef(25, -10, -15);
+								troncoNavidad.cilindro(2.0, 20.0, 10, textTroncoNavidad.GLindex);
+							glPopMatrix();
+
+							glPushMatrix();//Hojas
+								glTranslatef(25, 10, -15);
+								hojasNavidad.cono(30.0, 10.0, 30, textHojasNavidad.GLindex, 10.0);
+							glPopMatrix();
+							
+							glPushMatrix();//Regalo
+								glTranslatef(15, -8, -15);
+								glScalef(10, 7, 7);
+								regalo.prisma2(textRegaloFront.GLindex, textRegalo.GLindex);
+							glPopMatrix();
+
+						glPopMatrix(); //De navidad
+
+					glPopMatrix();//Del interior de la casa (muebles)
 
 				glEnable(GL_LIGHTING);
-				glPopMatrix();
+				glPopMatrix();//Del interior de la casa (para trasladar)
 			
-			glPopMatrix();// De interior casa
+			glPopMatrix();// De casa entera
 
 			glColor3f(1.0,1.0,1.0);
 
-		glPopMatrix();// De casa entera
+		glPopMatrix(); //Del ambiente
 
 	glPopMatrix(); //Pop final
 
@@ -832,9 +888,9 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
-	//printf("%.2f \n", objCamera.mPos.x);
-	//printf("%.2f \n", objCamera.mPos.y);
-	//printf("%.2f \n", objCamera.mPos.z);
+	printf("%.2f \n", objCamera.mPos.x);
+	printf("%.2f \n", objCamera.mPos.y);
+	printf("%.2f \n", objCamera.mPos.z);
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
@@ -884,11 +940,14 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			}
 			break;
 
-		case 'y':						
-		case 'Y':
-			textPuerta_Casa.LoadTGA("texturas/vacio.tga");
-			textPuerta_Casa.BuildGLTexture();
-			textPuerta_Casa.ReleaseImage();
+		case 'z':						
+		case 'Z':
+			if (objCamera.mPos.z > -7 && objCamera.mPos.z < -2 && objCamera.mPos.x>0) 
+			{
+				textPuerta_Casa.LoadTGA("texturas/vacio.tga");
+				textPuerta_Casa.BuildGLTexture();
+				textPuerta_Casa.ReleaseImage();
+			}
 			break;
 
 		case 'g':						
@@ -933,7 +992,7 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		if (objCamera.mPos.y>3)
+		//if (objCamera.mPos.y>3)
 			objCamera.UpDown_Camera(-CAMERASPEED);
 		break;
 
