@@ -70,6 +70,9 @@ GLfloat m_spec2[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
 GLfloat m_amb2[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
 GLfloat m_s2[] = {22};
 
+//////DESICIONES IMPORTANTES/////////
+bool terror = false;
+
 ///TEXTURAS///////
 
 CTexture text1; //cielo1
@@ -95,6 +98,10 @@ CTexture textTroncoNavidad;
 CTexture textHojasNavidad;
 CTexture textRegalo;
 CTexture textRegaloFront;
+CTexture textEsfera1;
+CTexture textEsfera2;
+CTexture textEsfera3;
+CTexture textEsfera4; CTexture textEsfera5;
 /////////////CFiguras interior de la casa/////////////////
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
@@ -112,6 +119,12 @@ CFiguras buro;
 CFiguras hojasNavidad;
 CFiguras troncoNavidad;
 CFiguras regalo;
+CFiguras esfera1;
+CFiguras esfera2;
+CFiguras esfera3;
+CFiguras esfera4;
+CFiguras esfera5;
+
 CFiguras cubo;
 
 //Exterior
@@ -148,7 +161,6 @@ void interpolation ( void )
 	
 
 }
-
 
 //NEW CASA//////////////////////////////////////
 void DibujaCasa ( void ){
@@ -586,9 +598,151 @@ void dibujaBuro(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosB
 			glPopMatrix();
 		glPopMatrix();
 }
+
+void esferas_navidad() {
+	//1
+	glPushMatrix();
+		glColor3f(0.0, 0.0, 1.0);
+		glTranslatef(16, 15, -15);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		esfera1.esfera(1, 10, 10, textEsfera1.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+	//2
+	glPushMatrix();
+		glColor3f(1.0, 1.0, 0.0);
+		glTranslatef(20, 19, -9);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		esfera2.esfera(1, 10, 10, textEsfera2.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+	//3
+	glPushMatrix();
+		glColor3f(1.0, 0.0, 1.0);
+		glTranslatef(20, 19, -21);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		esfera3.esfera(1, 10, 10, textEsfera3.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+	//4
+	glPushMatrix();
+		glColor3f(1.0, 0.5, 0.0);
+		glTranslatef(21, 30, -15);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		esfera4.esfera(1, 10, 10, textEsfera4.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+
+	//5
+	glPushMatrix();
+		glColor3f(0.5, 1.0, 0.5);
+		glTranslatef(22, 26, -10);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		esfera5.esfera(1, 10, 10, textEsfera5.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+}
+
+void navidad() {
+
+	if (terror == false) {
+		glPushMatrix();//Tronco
+			glTranslatef(25, -10, -15);
+			troncoNavidad.cilindro(2.0, 20.0, 10, textTroncoNavidad.GLindex);
+		glPopMatrix();
+	}
+
+	if (terror == false) {
+		glPushMatrix();//Hojas
+			glTranslatef(25, 10, -15);
+			hojasNavidad.cono(30.0, 10.0, 1500, textHojasNavidad.GLindex, 3.0);
+		glPopMatrix();
+	}
+
+	glPushMatrix();//Regalo
+		glTranslatef(15, -8, -15);
+		glScalef(10, 7, 7);
+		regalo.prisma2(textRegaloFront.GLindex, textRegalo.GLindex);
+	glPopMatrix();
+
+	if (terror == false) {
+		glPushMatrix();//Esferas
+			esferas_navidad();
+		glPopMatrix();
+	}
+}
+
+void texturas_casa_terror() {
+
+	text1.LoadBMP("texturas/cielo1.bmp");
+	text1.BuildGLTexture();
+	text1.ReleaseImage();
+
+	textPuerta_Casa.LoadTGA("texturas/vacio.tga");
+	textPuerta_Casa.BuildGLTexture();
+	textPuerta_Casa.ReleaseImage();
+
+	textWall.LoadBMP("casa/pared_vieja.bmp");
+	textWall.BuildGLTexture();
+	textWall.ReleaseImage();
+
+	textSilla.LoadBMP("casa/madera.bmp");
+	textSilla.BuildGLTexture();
+	textSilla.ReleaseImage();
+
+	textMarble.LoadBMP("casa/madera.bmp");
+	textMarble.BuildGLTexture();
+	textMarble.ReleaseImage();
+
+	textPiso.LoadBMP("casa/piso_terror.bmp");
+	textPiso.BuildGLTexture();
+	textPiso.ReleaseImage();
+
+	textTechoCasa.LoadBMP("casa/tejado_terror.bmp");
+	textTechoCasa.BuildGLTexture();
+	textTechoCasa.ReleaseImage();
+
+	textCuadro1.LoadBMP("casa/cuadro_terror.bmp");
+	textCuadro1.BuildGLTexture();
+	textCuadro1.ReleaseImage();
+
+	textGrass.LoadTGA("texturas/pasto.tga");
+	textGrass.BuildGLTexture();
+	textGrass.ReleaseImage();
+
+	textAlmohada.LoadBMP("casa/almohada.bmp");
+	textAlmohada.BuildGLTexture();
+	textAlmohada.ReleaseImage();
+
+	textColcha.LoadBMP("casa/colcha.bmp");
+	textColcha.BuildGLTexture();
+	textColcha.ReleaseImage();
+
+	textMaderaBuro.LoadBMP("casa/buro.bmp");
+	textMaderaBuro.BuildGLTexture();
+	textMaderaBuro.ReleaseImage();
+
+	textMaderaCama.LoadBMP("casa/maderaCama.bmp");
+	textMaderaCama.BuildGLTexture();
+	textMaderaCama.ReleaseImage();
+
+	//***Regalo**
+
+	textRegaloFront.LoadBMP("casa/regaloFront_terror.bmp");
+	textRegaloFront.BuildGLTexture();
+	textRegaloFront.ReleaseImage();
+
+}
+
 //END CASA////////////////////////////////////
 
-			
+
+
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
@@ -620,7 +774,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textPuerta_Casa.BuildGLTexture();
 	textPuerta_Casa.ReleaseImage();
 
-	textWall.LoadBMP("casa/pared_vieja.bmp");
+	textWall.LoadBMP("casa/pared_normal.bmp");
 	textWall.BuildGLTexture();
 	textWall.ReleaseImage();
 
@@ -669,7 +823,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textTroncoNavidad.BuildGLTexture();
 	textTroncoNavidad.ReleaseImage();
 
-	textHojasNavidad.LoadBMP("casa/hoja_pino.bmp");
+	textHojasNavidad.LoadBMP("casa/grass_2.bmp");
 	textHojasNavidad.BuildGLTexture();
 	textHojasNavidad.ReleaseImage();
 
@@ -680,6 +834,26 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textRegaloFront.LoadBMP("casa/regaloFront.bmp");
 	textRegaloFront.BuildGLTexture();
 	textRegaloFront.ReleaseImage();
+
+	textEsfera1.LoadTGA("casa/papel.tga");
+	textEsfera1.BuildGLTexture();
+	textEsfera1.ReleaseImage();
+
+	textEsfera2.LoadTGA("casa/papel2.tga");
+	textEsfera2.BuildGLTexture();
+	textEsfera2.ReleaseImage();
+
+	textEsfera3.LoadTGA("casa/papel3.tga");
+	textEsfera3.BuildGLTexture();
+	textEsfera3.ReleaseImage();
+
+	textEsfera4.LoadTGA("casa/papel4.tga");
+	textEsfera4.BuildGLTexture();
+	textEsfera4.ReleaseImage();
+
+	textEsfera5.LoadTGA("casa/papel5.tga");
+	textEsfera5.BuildGLTexture();
+	textEsfera5.ReleaseImage();
 
 	//END NEW//////////////////////////////
 
@@ -714,6 +888,7 @@ void pintaTexto(float x, float y, float z, void *font,char *string)
     glutBitmapCharacter(font, *c); //imprime
   }
 }
+
 
 void display ( void )   // Creamos la funcion donde se dibuja
 {
@@ -793,23 +968,8 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 						////***Navidad, arbol y regalos
 						glPushMatrix();
-						glTranslatef(10, 0, 0);
-							glPushMatrix();//Tronco
-								glTranslatef(25, -10, -15);
-								troncoNavidad.cilindro(2.0, 20.0, 10, textTroncoNavidad.GLindex);
-							glPopMatrix();
-
-							glPushMatrix();//Hojas
-								glTranslatef(25, 10, -15);
-								hojasNavidad.cono(30.0, 10.0, 30, textHojasNavidad.GLindex, 10.0);
-							glPopMatrix();
-							
-							glPushMatrix();//Regalo
-								glTranslatef(15, -8, -15);
-								glScalef(10, 7, 7);
-								regalo.prisma2(textRegaloFront.GLindex, textRegalo.GLindex);
-							glPopMatrix();
-
+							glTranslatef(10, 0, 0);
+							navidad();
 						glPopMatrix(); //De navidad
 
 					glPopMatrix();//Del interior de la casa (muebles)
@@ -944,9 +1104,8 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'Z':
 			if (objCamera.mPos.z > -7 && objCamera.mPos.z < -2 && objCamera.mPos.x>0) 
 			{
-				textPuerta_Casa.LoadTGA("texturas/vacio.tga");
-				textPuerta_Casa.BuildGLTexture();
-				textPuerta_Casa.ReleaseImage();
+				texturas_casa_terror();
+				terror = true;
 			}
 			break;
 

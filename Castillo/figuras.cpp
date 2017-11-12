@@ -462,96 +462,114 @@ void CFiguras::prisma_anun (GLuint text, GLuint text2)  //Funcion creacion prism
 
 
 
-void CFiguras::esfera(GLfloat radio, int meridianos, int paralelos, GLuint text )
+void CFiguras::esfera(GLfloat radio, int meridianos, int paralelos, GLuint text)
 {
-	
-	GLdouble angulop = 3.1415/paralelos;
-	GLdouble angulom = 3.1415/meridianos;
 	GLdouble theta, phi;
-	//bool even = true;
-	
+
+	float ctext_s = 1.0 / meridianos;
+	float ctext_t = 1.0 / paralelos;
+
 	glBindTexture(GL_TEXTURE_2D, text);   // choose the texture to use.
 
-	for(double p =-3.14/2; p < 3.14/2; p += angulop)
+	float v1[] = { 0.0, 0.0, 0.0 };
+	float v2[] = { 0.0, 0.0, 0.0 };
+	float v3[] = { 0.0, 0.0, 0.0 };
+	float v4[] = { 0.0, 0.0, 0.0 };
+	int i, j;
+	float angulom, angulop;
+	angulom = 2 * 3.141592654 / meridianos;
+	angulop = 3.141592654 / paralelos;
+	for (i = 0; i<meridianos; i++)
 	{
-		for(double m = 0; m < 3.14*2; m+=angulom)
+		for (j = 0; j<paralelos; j++)
 		{
-			//glBegin(GL_LINE_LOOP);
+			v1[0] = radio*cos(angulom*i)*sin(angulop*j);
+			v1[1] = radio*cos(angulop*j);
+			v1[2] = radio*sin(angulom*i)*sin(angulop*j);
+
+			v2[0] = radio*cos(angulom*i)*sin(angulop*(j + 1));
+			v2[1] = radio*cos(angulop*(j + 1));
+			v2[2] = radio*sin(angulom*i)*sin(angulop*(j + 1));
+
+			v3[0] = radio*cos(angulom*(i + 1))*sin(angulop*(j + 1));
+			v3[1] = radio*cos(angulop*(j + 1));
+			v3[2] = radio*sin(angulom*(i + 1))*sin(angulop*(j + 1));
+
+			v4[0] = radio*cos(angulom*(i + 1))*sin(angulop*j);
+			v4[1] = radio*cos(angulop*j);
+			v4[2] = radio*sin(angulom*(i + 1))*sin(angulop*j);
+
 			glBegin(GL_POLYGON);
-			
-			//glBegin(GL_POINTS);
-			glNormal3f( radio*cos(p + angulop)*cos(m), radio*sin(p + angulop), radio*cos(p + angulop)*sin(m));			
-			glVertex3f( radio*cos(p + angulop)*cos(m), radio*sin(p + angulop), radio*cos(p + angulop)*sin(m));	
-
-			glNormal3f( radio*cos(p + angulop)*cos(m + angulom), radio*sin(p + angulop), radio*cos(p + angulop)*sin(m + angulom));
-			glVertex3f( radio*cos(p + angulop)*cos(m + angulom), radio*sin(p + angulop), radio*cos(p + angulop)*sin(m + angulom));
-
-			glNormal3f( radio*cos(p)*cos(m + angulom), radio*sin(p), radio*cos(p)*sin(m + angulom));
-			glVertex3f( radio*cos(p)*cos(m + angulom), radio*sin(p), radio*cos(p)*sin(m + angulom));
-
-			glNormal3f(radio*cos(p)*cos(m), radio*sin(p), radio*cos(p)*sin(m));
-			glVertex3f( radio*cos(p)*cos(m), radio*sin(p), radio*cos(p)*sin(m));
-				
+			glNormal3fv(v1);
+			glTexCoord2f(ctext_s*i, -ctext_t*j);
+			glVertex3fv(v1);
+			glNormal3fv(v2);
+			glTexCoord2f(ctext_s*i, -ctext_t*(j + 1));
+			glVertex3fv(v2);
+			glNormal3fv(v3);
+			glTexCoord2f(ctext_s*(i + 1), -ctext_t*(j + 1));
+			glVertex3fv(v3);
+			glNormal3fv(v4);
+			glTexCoord2f(ctext_s*(i + 1), -ctext_t*j);
+			glVertex3fv(v4);
 			glEnd();
 		}
 	}
 }
 
-
-void CFiguras::torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos )
+void CFiguras::torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos)
 {
 
 	float R = 0;
 	float r = 0;
 
-	float v1[]={0.0, 0.0, 0.0};
-	float v2[]={0.0, 0.0, 0.0};
-	float v3[]={0.0, 0.0, 0.0};
-	float v4[]={0.0, 0.0, 0.0};
+	float v1[] = { 0.0, 0.0, 0.0 };
+	float v2[] = { 0.0, 0.0, 0.0 };
+	float v3[] = { 0.0, 0.0, 0.0 };
+	float v4[] = { 0.0, 0.0, 0.0 };
 
-	int i,j;
+	int i, j;
 
-	GLdouble angulop = 2*3.1415/paralelos;
-	GLdouble angulom = 2*3.1415/meridianos;
+	GLdouble angulop = 2 * 3.1415 / paralelos;
+	GLdouble angulom = 2 * 3.1415 / meridianos;
 
-	r = (radioM - radiom)/2;
+	r = (radioM - radiom) / 2;
 	R = radiom + r;
 
-	for(i=0;i<meridianos;i++)
+	for (i = 0; i<meridianos; i++)
 	{
-		for(j=0;j<paralelos;j++)
+		for (j = 0; j<paralelos; j++)
 		{
-			
-			v1[0]=R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*j);
-			v1[2]=R*sin(angulom*i)+ r*sin(angulom*i)*cos(angulop*j);
-			v1[1]=r*sin(angulop*j);
+
+			v1[0] = R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*j);
+			v1[2] = R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*j);
+			v1[1] = r*sin(angulop*j);
 
 			glNormal3f(v1[0], v1[1], v1[2]);
-			
-			v2[0]=R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*(j+1));
-			v2[2]=R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*(j+1));
-			v2[1]=r*sin(angulop*(j+1));
+
+			v2[0] = R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*(j + 1));
+			v2[2] = R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*(j + 1));
+			v2[1] = r*sin(angulop*(j + 1));
 
 			glNormal3f(v2[0], v2[1], v2[2]);
 
-			v3[0]=R*cos(angulom*(i+1)) + r*cos(angulom*(i+1))*cos(angulop*(j+1));
-			v3[2]=R*sin(angulom*(i+1)) + r*sin(angulom*(i+1))*cos(angulop*(j+1));
-			v3[1]=r*sin(angulop*(j+1));
+			v3[0] = R*cos(angulom*(i + 1)) + r*cos(angulom*(i + 1))*cos(angulop*(j + 1));
+			v3[2] = R*sin(angulom*(i + 1)) + r*sin(angulom*(i + 1))*cos(angulop*(j + 1));
+			v3[1] = r*sin(angulop*(j + 1));
 
 			glNormal3f(v3[0], v3[1], v3[2]);
 
-			v4[0]=R*cos(angulom*(i+1)) + r*cos(angulom*(i+1))*cos(angulop*j);
-			v4[2]=R*sin(angulom*(i+1)) + r*sin(angulom*(i+1))*cos(angulop*j);
-			v4[1]=r*sin(angulop*j);
+			v4[0] = R*cos(angulom*(i + 1)) + r*cos(angulom*(i + 1))*cos(angulop*j);
+			v4[2] = R*sin(angulom*(i + 1)) + r*sin(angulom*(i + 1))*cos(angulop*j);
+			v4[1] = r*sin(angulop*j);
 
 			glNormal3f(v4[0], v4[1], v4[2]);
-			
-			//glBegin(GL_LINE_LOOP);
+
 			glBegin(GL_POLYGON);
-				glVertex3fv(v1);
-				glVertex3fv(v2);
-				glVertex3fv(v3);
-				glVertex3fv(v4);
+			glVertex3fv(v1);
+			glVertex3fv(v2);
+			glVertex3fv(v3);
+			glVertex3fv(v4);
 			glEnd();
 		}
 	}
