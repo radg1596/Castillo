@@ -75,7 +75,7 @@ void CFiguras::skybox(float largo, float altura, float profundidad, GLuint text,
 		glEnd();
 }
 
-void CFiguras::skybox_casa(float largo, float altura, float profundidad, GLuint text_paredes, GLuint text_piso, GLuint text_puerta, GLuint text_techo, float r, float s , float t)  //Funcion creacion cielo
+void CFiguras::skybox_casa(float largo, float altura, float profundidad, GLuint text_paredes, GLuint text_piso, GLuint text_puerta, GLuint text_techo, float r, float s , float t, float abrirCasa)  //Funcion creacion cielo
 {
 
 	GLfloat vertice[12][3] = {
@@ -159,16 +159,17 @@ void CFiguras::skybox_casa(float largo, float altura, float profundidad, GLuint 
 	glTexCoord2f(0.0f, t); glVertex3fv(vertice[7]);
 	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, text_puerta);
-	glBegin(GL_POLYGON);	//Puerta
-							//glColor3f(0.0,1.0,0.0);
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glTexCoord2f(0.0f, r); glVertex3fv(vertice[9]);
-	glTexCoord2f(r, r); glVertex3fv(vertice[10]);
-	glTexCoord2f(r, 0.0f); glVertex3fv(vertice[3]);
-	glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[11]);
-	glEnd();
-
+	glPushMatrix();
+		glBindTexture(GL_TEXTURE_2D, text_puerta);
+		glTranslatef(abrirCasa, 0, 0);
+		glBegin(GL_POLYGON);	//Puerta
+			glNormal3f(0.0f, 0.0f, 1.0f);
+			glTexCoord2f(0.0f, r); glVertex3fv(vertice[9]);
+			glTexCoord2f(r, r); glVertex3fv(vertice[10]);
+			glTexCoord2f(r, 0.0f); glVertex3fv(vertice[3]);
+			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[11]);
+		glEnd();
+	glPopMatrix();
 }
 
 void CFiguras::prisma(float altura, float largo, float profundidad, GLuint text)  //Funcion creacion prisma

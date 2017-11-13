@@ -21,7 +21,7 @@ class CFiguras
 	void prisma_tablero(float altura, float largo, float profundidad, GLuint text, float repeticion_text);
 	void prisma2 (GLuint text, GLuint text2);
 	void skybox(float altura, float largo, float profundidad, GLuint text, float repeticion);	//Funcion creacion cielo
-	void skybox_casa(float altura, float largo, float profundidad, GLuint text_paredes, GLuint text_piso, GLuint text_puerta, GLuint text_techo, float repeticion_paredes, float repeticion_piso, float repeticion_techo );
+	void skybox_casa(float altura, float largo, float profundidad, GLuint text_paredes, GLuint text_piso, GLuint text_puerta, GLuint text_techo, float repeticion_paredes, float repeticion_piso, float repeticion_techo, float angPuertaCasa);
 
 	//void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text );
 	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos);
