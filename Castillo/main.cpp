@@ -74,13 +74,23 @@ GLfloat m_s2[] = {22};
 bool terror = false;
 bool puertaAbierta=false;
 
-////////////VARIABLES DE ROTACION////////////////////
+////////////VARIABLES DE ROTACION Y TRASLADO////////////////////
 //******CASA*******
 float trasladoPuerta = 0.0;
+float angNubes;
+float angFuego = 0;
+float angArboles = 0;
+
+
+///////////////VARIABLES DE MAQUINAS DE ESTADO////////////
+bool estado0Arboles = true;
+bool estado1Arboles = false;
 
 ///TEXTURAS///////
-
+//Exterior
 CTexture text1; //cielo1
+CTexture textGrass;
+CTexture textMar;
 
 
 //NEW///////////////////////////7
@@ -93,11 +103,14 @@ CTexture textTechoCasa;
 CTexture textSilla;
 CTexture textMarble;
 CTexture textCuadro1;
-CTexture textGrass;
 CTexture textAlmohada;
 CTexture textColcha;
 CTexture textMaderaBuro;
 CTexture textMaderaCama;
+CTexture textChimenea;
+CTexture textSChimenea;
+CTexture textFuego;
+
 //Navidad
 CTexture textTroncoNavidad;
 CTexture textHojasNavidad;
@@ -107,6 +120,15 @@ CTexture textEsfera1;
 CTexture textEsfera2;
 CTexture textEsfera3;
 CTexture textEsfera4; CTexture textEsfera5;
+
+//Arboles Casa
+CTexture textTree;
+CTexture textTreeN;
+CTexture textTreeN2;
+CTexture textTreeV;
+CTexture textTree0;
+CTexture textTree1;
+
 /////////////CFiguras interior de la casa/////////////////
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
@@ -120,6 +142,7 @@ CFiguras respaldoSilla3;
 CFiguras respaldoSilla4;
 CFiguras cama;
 CFiguras buro;
+CFiguras chimenea;
 //****Navidad***
 CFiguras hojasNavidad;
 CFiguras troncoNavidad;
@@ -129,11 +152,12 @@ CFiguras esfera2;
 CFiguras esfera3;
 CFiguras esfera4;
 CFiguras esfera5;
-
+///OTRAS//////
 CFiguras cubo;
-
-//Exterior
+////EXTERIOR/////
 CFiguras pasto;
+CFiguras mar;
+
 
 ///////////////////FIGURAS EN 3D///////////////////
 //****Interior casa********
@@ -165,6 +189,66 @@ void interpolation ( void )
 {
 	
 
+}
+
+
+///****PlanosCruzados////////
+void planos_cruzados(GLuint text)
+{
+	glPushMatrix();
+	//glDisable(GL_LIGHTING);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.1);
+	glBindTexture(GL_TEXTURE_2D, text);
+	glBegin(GL_QUADS); //plano
+	glColor3f(1.0, 1.0, 1.0);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(10.0, 20.0, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-10.0, 20.0, 0.0);
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(45, 0, 1, 0);
+	glBegin(GL_QUADS); //plano
+	glColor3f(1.0, 1.0, 1.0);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(10.0, 20.0, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-10.0, 20.0, 0.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(-45, 0, 1, 0);
+	glBegin(GL_QUADS); //plano
+	glColor3f(1.0, 1.0, 1.0);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(10.0, 20.0, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-10.0, 20.0, 0.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(90, 0, 1, 0);
+	glBegin(GL_QUADS); //plano
+	glColor3f(1.0, 1.0, 1.0);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(10.0, 0.0, 0.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(10.0, 20.0, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-10.0, 20.0, 0.0);
+	glEnd();
+	glDisable(GL_ALPHA_TEST);
+	//glEnable(GL_LIGHTING);
+
+	glPopMatrix();
 }
 
 //NEW CASA//////////////////////////////////////
@@ -719,7 +803,7 @@ void texturas_casa_terror() {
 	textCuadro1.BuildGLTexture();
 	textCuadro1.ReleaseImage();
 
-	textGrass.LoadTGA("texturas/pasto.tga");
+	textGrass.LoadBMP("texturas/pasto.bmp");
 	textGrass.BuildGLTexture();
 	textGrass.ReleaseImage();
 
@@ -739,8 +823,65 @@ void texturas_casa_terror() {
 	textMaderaCama.BuildGLTexture();
 	textMaderaCama.ReleaseImage();
 
+	textChimenea.LoadBMP("casa/buro_terror.bmp");
+	textChimenea.BuildGLTexture();
+	textChimenea.ReleaseImage();
+
+	textSChimenea.LoadBMP("casa/buro_terror.bmp");
+	textSChimenea.BuildGLTexture();
+	textSChimenea.ReleaseImage();
+
+	textFuego.LoadBMP("casa/Fuego.bmp");
+	textFuego.BuildGLTexture();
+	textFuego.ReleaseImage();
+
+	///////***ARBOLES FUERA DE CASA, CERCA///////
+	textTree.LoadTGA("texturas/treeSeco.tga");
+	textTree.BuildGLTexture();
+	textTree.ReleaseImage();
+
+	textTreeN.LoadTGA("texturas/treeSeco.tga");
+	textTreeN.BuildGLTexture();
+	textTreeN.ReleaseImage();
+
+	textTreeN2.LoadTGA("texturas/treeSeco.tga");
+	textTreeN2.BuildGLTexture();
+	textTreeN2.ReleaseImage();
+
+	textTreeV.LoadTGA("texturas/treeSeco.tga");
+	textTreeV.BuildGLTexture();
+	textTreeV.ReleaseImage();
+
+	textTree0.LoadTGA("texturas/treeSeco.tga");
+	textTree0.BuildGLTexture();
+	textTree0.ReleaseImage();
+
+	textTree1.LoadTGA("texturas/treeSeco.tga");
+	textTree1.BuildGLTexture();
+	textTree1.ReleaseImage();
+
 }
 
+void DibujaChimenea() {
+
+	glPushMatrix();//Caja
+		glTranslatef(20, 3, 32);
+		glRotatef(180, 0, 1, 0);
+		chimenea.skybox_sin_tapa(20, 25, 20, textChimenea.GLindex, 1);
+	glPopMatrix();
+
+	glPushMatrix();//Subida a techo
+		glTranslatef(20, 51, 35);
+		glRotatef(90, 0, 0, 1);
+		chimenea.prisma(10, 72, 10, textMaderaBuro.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//Fuego
+		glTranslatef(20, -10, 30);
+		glRotatef(angFuego, 0, 1, 0);
+		planos_cruzados(textFuego.GLindex);
+	glPopMatrix();
+}
 //END CASA////////////////////////////////////
 
 
@@ -765,11 +906,19 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
+	//////EXTERIOR//////////
 
+	textGrass.LoadBMP("texturas/pasto.bmp");
+	textGrass.BuildGLTexture();
+	textGrass.ReleaseImage();
     
     text1.LoadBMP("texturas/cielo.bmp");
 	text1.BuildGLTexture();
 	text1.ReleaseImage();
+
+	textMar.LoadTGA("texturas/mar.tga");
+	textMar.BuildGLTexture();
+	textMar.ReleaseImage();
 
 	//Texturas casa////////////////////////////////////////////
 	textPuerta_Casa.LoadBMP("casa/door_3_4_puerta.bmp");
@@ -799,10 +948,6 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textCuadro1.LoadBMP("casa/cuadro.bmp");
 	textCuadro1.BuildGLTexture();
 	textCuadro1.ReleaseImage();
-
-	textGrass.LoadTGA("texturas/pasto.tga");
-	textGrass.BuildGLTexture();
-	textGrass.ReleaseImage();
 	
 	textAlmohada.LoadBMP("casa/almohada.bmp");
 	textAlmohada.BuildGLTexture();
@@ -819,6 +964,19 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textMaderaCama.LoadBMP("casa/maderaCama.bmp");
 	textMaderaCama.BuildGLTexture();
 	textMaderaCama.ReleaseImage();
+
+	textChimenea.LoadBMP("casa/brickwall.bmp");
+	textChimenea.BuildGLTexture();
+	textChimenea.ReleaseImage();
+
+	textSChimenea.LoadBMP("casa/madera3.bmp");
+	textSChimenea.BuildGLTexture();
+	textSChimenea.ReleaseImage();
+	
+	textFuego.LoadTGA("casa/Fuego.tga");
+	textFuego.BuildGLTexture();
+	textFuego.ReleaseImage();
+	
 
 	//***Navidad***
 	textTroncoNavidad.LoadBMP("casa/tronco_navidad.bmp");
@@ -856,6 +1014,32 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textEsfera5.LoadTGA("casa/papel5.tga");
 	textEsfera5.BuildGLTexture();
 	textEsfera5.ReleaseImage();
+
+///////***ARBOLES FUERA DE CASA, CERCA///////
+	textTree.LoadTGA("texturas/tree.tga");
+	textTree.BuildGLTexture();
+	textTree.ReleaseImage();
+
+	textTreeN.LoadTGA("texturas/treeN.tga");
+	textTreeN.BuildGLTexture();
+	textTreeN.ReleaseImage();
+
+	textTreeN2.LoadTGA("texturas/treeN2.tga");
+	textTreeN2.BuildGLTexture();
+	textTreeN2.ReleaseImage();
+
+	textTreeV.LoadTGA("texturas/treeV.tga");
+	textTreeV.BuildGLTexture();
+	textTreeV.ReleaseImage();
+
+	textTree0.LoadTGA("texturas/tree0.tga");
+	textTree0.BuildGLTexture();
+	textTree0.ReleaseImage();
+
+	textTree1.LoadTGA("texturas/tree1.tga");
+	textTree1.BuildGLTexture();
+	textTree1.ReleaseImage();
+
 
 	//END NEW//////////////////////////////
 
@@ -899,7 +1083,6 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	glLoadIdentity();
 	glPushMatrix(); //Push inicial
 	
-
 	glRotatef(g_lookupdown,1.0f,0,0);
 
 		gluLookAt(	objCamera.mPos.x,  objCamera.mPos.y,  objCamera.mPos.z,	
@@ -912,29 +1095,82 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			glPushMatrix(); //Creamos cielo
 				glDisable(GL_LIGHTING);
 					glTranslatef(0,800,0);
-					fig1.skybox(1600.0, 1600.0, 1600.0,text1.GLindex,1.0);
+					glRotatef(angNubes, 0, 1, 0);
+					fig1.skybox(1000.0, 1600.0, 1000.0,text1.GLindex,1.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();	
 
+			///////Mar///////////////
+			glPushMatrix();
+				glDisable(GL_LIGHTING);
+				glTranslatef(0, 0.2, 0);
+				pasto.prisma_tablero(0.1, 1400, 1400, textMar.GLindex, 1.0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
 
 			///////PASTO////////////
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
 				//glDisable(GL_COLOR_MATERIAL);
-				pasto.prisma_tablero(0.1, 100, 100, textGrass.GLindex, 20.0);
+				glTranslatef(0, 0.3, 0);
+				pasto.prisma_tablero(0.1, 80, 80, textGrass.GLindex, 200.0);
 				//Cup.GLrender(NULL, _SHADED, 1.0);
 				//glEnable(GL_COLOR_MATERIAL);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
+			////////ARBOLES CASA-COLINDANTES
+			glPushMatrix();
+				glDisable(GL_LIGHTING);
+
+				glPushMatrix();//1
+					glTranslatef(30, -1, 25);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTree.GLindex);
+				glPopMatrix();
+
+				glPushMatrix();//2
+					glTranslatef(30, 0, -25);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTreeN.GLindex);
+				glPopMatrix();
+
+				glPushMatrix();//3
+					glTranslatef(-30, -2, 25);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTreeN2.GLindex);
+				glPopMatrix();
+
+				glPushMatrix();//4
+					glTranslatef(-30, 0, -25);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTreeV.GLindex);
+				glPopMatrix();
+
+				glPushMatrix();//5
+					glTranslatef(0, 0, 30);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTree0.GLindex);
+				glPopMatrix();
+
+				glPushMatrix();//6
+					glTranslatef(0, 0, -25);
+					glRotatef(angArboles, 0, 1, 0);
+					planos_cruzados(textTree1.GLindex);
+				glPopMatrix();
+
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
+
 			//CASA///////////////////
 			glPushMatrix(); //Casa completa
-				glTranslatef(0, 7.7, 0);
+				glTranslatef(0, 8.0, 0);
 				//*****Paredes, Piso y Techo *****
 				glPushMatrix();
 					glDisable(GL_LIGHTING);
 					glScalef(1.0, 0.5, 1.0);
 					dibujaContornoCasa();
+					glEnable(GL_LIGHTING);
 				glPopMatrix();
 				//¨****Interior casa*****
 				glPushMatrix();
@@ -944,8 +1180,15 @@ void display ( void )   // Creamos la funcion donde se dibuja
 					glScalef(0.3, 0.3, 0.3);
 			
 					glPushMatrix();
-						//cuadro			
+						//******Cuadro****			
 						cuadro();
+						//******Chimenea****
+						glPushMatrix();
+							
+							glTranslatef(-10, 0, 0);
+							DibujaChimenea();
+
+						glPopMatrix();  //De chimenea
 						//****COMEDOR***
 						glPushMatrix();
 							glTranslatef(-20,0,25);
@@ -953,7 +1196,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 							comedor();
 						glPopMatrix();
 
-						//*****ROSE*****
+						//*****CAMA Y BURO*****
 						glPushMatrix(); 
 							glPushMatrix();
 								glTranslatef(0,0,-0.5); 
@@ -992,7 +1235,34 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 void animacion()
 {
+	///////*******NUBES*********////////////
+	if (terror == false)
+		angNubes += 0.01;
+
+	//////*********FUEGO******//////////////
+	angFuego += 45.0;
+	
+	////////******ARBOLES******//////////////
+	if (estado0Arboles && terror==false) {
+		if (angArboles<10.0)
+			angArboles += 6.0;
+		else {
+			estado0Arboles = false;
+			estado1Arboles = true;
+		}
+	}
+
+	if (estado1Arboles && terror==false) {
+		if (angArboles>0.0)
+			angArboles -= 6.0;
+		else {
+			estado1Arboles = false;
+			estado0Arboles = true;
+		}
+	}
+
 	//Movimiento del monito
+
 	if(play)
 	{		
 		
@@ -1079,7 +1349,6 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			{
 				saveFrame();
 			}
-
 			break;
 
 		case 'l':						
