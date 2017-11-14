@@ -10,7 +10,7 @@
 #include "texture.h"
 #include "figuras.h"
 #include "Camera.h"
-
+#include "Windows.h"
 #include "cmodel/CModel.h"
 
 //NEW//////////////////NEW//////////////////NEW//////////////////NEW////////////////
@@ -73,6 +73,7 @@ GLfloat m_s2[] = {22};
 //////DESICIONES IMPORTANTES/////////
 bool terror = false;
 bool puertaAbierta=false;
+
 
 ////////////VARIABLES DE ROTACION Y TRASLADO////////////////////
 //******CASA*******
@@ -886,6 +887,19 @@ void DibujaChimenea() {
 
 
 
+/////////FUNCIONES DE SONIDO/////////////
+void PlayAire() {
+	PlaySound(TEXT("sonidos/aire.wav"), NULL, SND_LOOP | SND_ASYNC);
+}
+
+//void PlayPuerta() {
+//	PlaySound(TEXT("puerta.wav"),NULL, SND_ASYNC);
+//}
+
+///////SND_ASYNC hilo que reproduce una vez
+////////SND_LOOP | SND_ASYNC hilo que reproduce en bucle
+
+
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
@@ -1047,7 +1061,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	Cup._3dsLoad("modelos/Cup.3ds");
 
 
-	objCamera.Position_Camera(-6, 6.0f,-5, -6, 6.0f,0, 0, 1, 0); //Posision inicial de la camara
+	objCamera.Position_Camera(-6, 4.0f,-5, -6, 4.0f,0, 0, 1, 0); //Posision inicial de la camara
 
 	//NEW Iniciar variables de KeyFrames
 	for(int i=0; i<MAX_FRAMES; i++)
@@ -1136,7 +1150,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glPopMatrix();
 
 				glPushMatrix();//3
-					glTranslatef(-30, -2, 25);
+					glTranslatef(-30, -1, 25);
 					glRotatef(angArboles, 0, 1, 0);
 					planos_cruzados(textTreeN2.GLindex);
 				glPopMatrix();
@@ -1376,6 +1390,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			{
 				texturas_casa_terror();
 				terror = true;
+				PlaySound(NULL, NULL, 0);
 			}
 			break;
 
@@ -1518,6 +1533,9 @@ int main ( int argc, char** argv )   // Main Function
   glutSpecialFunc     ( arrow_keys );	//Otras
   glutIdleFunc		  ( animacion );
 
+  ////////Sonido////////
+ PlayAire();
+
   submenu = glutCreateMenu	  ( menuKeyFrame );
   glutAddMenuEntry	  ("Guardar KeyFrame", 0);
   glutAddMenuEntry	  ("Reproducir Animacion", 1);
@@ -1525,7 +1543,6 @@ int main ( int argc, char** argv )   // Main Function
   glutAddSubMenu	  ("Animacion Monito", submenu);
  
   glutAttachMenu	  (GLUT_RIGHT_BUTTON);
-
 
   glutMainLoop        ( );          // 
 
