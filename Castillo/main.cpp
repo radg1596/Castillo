@@ -13,6 +13,10 @@
 #include "Windows.h"
 #include "cmodel/CModel.h"
 
+
+///////Contadores////////
+float i = 0, j = 0;
+
 //NEW//////////////////NEW//////////////////NEW//////////////////NEW////////////////
 
 
@@ -93,6 +97,9 @@ CTexture text1; //cielo1
 CTexture textGrass;
 CTexture textMar;
 
+///CAMINO PIEDRA
+CTexture textPiedra;
+
 
 //NEW///////////////////////////7
 //Casa
@@ -158,6 +165,7 @@ CFiguras cubo;
 ////EXTERIOR/////
 CFiguras pasto;
 CFiguras mar;
+CFiguras camino;
 
 
 ///////////////////FIGURAS EN 3D///////////////////
@@ -885,19 +893,63 @@ void DibujaChimenea() {
 }
 //END CASA////////////////////////////////////
 
+void DibujaArbolesCasa() {
+	
+	glDisable(GL_LIGHTING);
 
+	glPushMatrix();//1
+		glTranslatef(30, -1, 25);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTree.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//2
+		glTranslatef(30, 0, -25);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTreeN.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//3
+		glTranslatef(-30, -1, 25);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTreeN2.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//4
+		glTranslatef(-30, 0, -25);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTreeV.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//5
+		glTranslatef(0, 0, 30);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTree0.GLindex);
+	glPopMatrix();
+
+	glPushMatrix();//6
+		glTranslatef(0, 0, -25);
+		glRotatef(angArboles, 0, 1, 0);
+		planos_cruzados(textTree1.GLindex);
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
+}
 
 /////////FUNCIONES DE SONIDO/////////////
 void PlayAire() {
 	PlaySound(TEXT("sonidos/aire.wav"), NULL, SND_LOOP | SND_ASYNC);
 }
 
+void PlayMozart() {
+	PlaySound(TEXT("sonidos/terror.wav"), NULL, SND_LOOP | SND_ASYNC);
+}
 //void PlayPuerta() {
 //	PlaySound(TEXT("puerta.wav"),NULL, SND_ASYNC);
 //}
 
 ///////SND_ASYNC hilo que reproduce una vez
-////////SND_LOOP | SND_ASYNC hilo que reproduce en bucle
+////////SND_LOOP | SND_ASYNC reproduce en bucle y si hay otro sonido se detiene
 
 
 void InitGL ( GLvoid )     // Inicializamos parametros
@@ -933,6 +985,10 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textMar.LoadTGA("texturas/mar.tga");
 	textMar.BuildGLTexture();
 	textMar.ReleaseImage();
+
+	textPiedra.LoadTGA("texturas/piedra.tga");
+	textPiedra.BuildGLTexture();
+	textPiedra.ReleaseImage();
 
 	//Texturas casa////////////////////////////////////////////
 	textPuerta_Casa.LoadBMP("casa/door_3_4_puerta.bmp");
@@ -1108,26 +1164,20 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 			glPushMatrix(); //Creamos cielo
 				glDisable(GL_LIGHTING);
-					glTranslatef(0,800,0);
+					glTranslatef(0,499.5,0);
 					glRotatef(angNubes, 0, 1, 0);
-					fig1.skybox(1000.0, 1600.0, 1000.0,text1.GLindex,1.0);
+					fig1.skybox_cielo(2000.0, 1000.0, 2000.0,text1.GLindex, textMar.GLindex, text1.GLindex, 1.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();	
 
-			///////Mar///////////////
-			glPushMatrix();
-				glDisable(GL_LIGHTING);
-				glTranslatef(0, 0.2, 0);
-				pasto.prisma_tablero(0.1, 1400, 1400, textMar.GLindex, 1.0);
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
-
-			///////PASTO////////////
+			///////PASTO_ISLAS////////////
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
 				//glDisable(GL_COLOR_MATERIAL);
-				glTranslatef(0, 0.3, 0);
-				pasto.prisma_tablero(0.1, 80, 80, textGrass.GLindex, 200.0);
+				//glTranslatef(0, 0, 0);
+				pasto.prisma_tablero(0.1, 80, 80, textGrass.GLindex, 50.0);
+				glTranslatef(190, 0, 10);
+				pasto.prisma_tablero(0.1, 280, 300, textGrass.GLindex, 50.0);
 				//Cup.GLrender(NULL, _SHADED, 1.0);
 				//glEnable(GL_COLOR_MATERIAL);
 				glEnable(GL_LIGHTING);
@@ -1135,50 +1185,55 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 			////////ARBOLES CASA-COLINDANTES
 			glPushMatrix();
+				DibujaArbolesCasa();
+			glPopMatrix();
+
+			////////BOSQUE///////
+
+			glPushMatrix();
 				glDisable(GL_LIGHTING);
+				glTranslatef(55, -1, -10);
 
-				glPushMatrix();//1
-					glTranslatef(30, -1, 25);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTree.GLindex);
+				glScalef(1, 2, 1);
+
+				glPushMatrix(); //Parte A
+					for (i = 0; i < 12; i++) {
+						for (j = 0; j < 7; j++) {
+							glPushMatrix();
+								glTranslatef(i * 20, 0, j*-20);
+								glRotatef(angArboles, 0, 1, 0);
+								planos_cruzados(textTree.GLindex);
+							glPopMatrix();
+						}
+					}
 				glPopMatrix();
 
-				glPushMatrix();//2
-					glTranslatef(30, 0, -25);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTreeN.GLindex);
-				glPopMatrix();
-
-				glPushMatrix();//3
-					glTranslatef(-30, -1, 25);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTreeN2.GLindex);
-				glPopMatrix();
-
-				glPushMatrix();//4
-					glTranslatef(-30, 0, -25);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTreeV.GLindex);
-				glPopMatrix();
-
-				glPushMatrix();//5
-					glTranslatef(0, 0, 30);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTree0.GLindex);
-				glPopMatrix();
-
-				glPushMatrix();//6
-					glTranslatef(0, 0, -25);
-					glRotatef(angArboles, 0, 1, 0);
-					planos_cruzados(textTree1.GLindex);
+				glPushMatrix(); //Parte B
+					glTranslatef(0, 0, 45);
+					for (i = 0; i < 12; i++) {
+						for (j = 0; j < 7; j++) {
+							glPushMatrix();
+								glTranslatef(i * 20, 0, j*+20);
+								glRotatef(angArboles, 0, 1, 0);
+								planos_cruzados(textTree.GLindex);
+							glPopMatrix();
+						}
+					}
 				glPopMatrix();
 
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
+			//////CAMINO//////////
+			glPushMatrix();
+				glDisable(GL_LIGHTING);
+				glTranslatef(165, 0.2, 10);
+				camino.prisma_tablero(0.1, 300, 10, textPiedra.GLindex, 10.0);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
 			//CASA///////////////////
 			glPushMatrix(); //Casa completa
-				glTranslatef(0, 8.0, 0);
+				glTranslatef(0, 7.7, 0);
 				//*****Paredes, Piso y Techo *****
 				glPushMatrix();
 					glDisable(GL_LIGHTING);
@@ -1325,7 +1380,7 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 	// Tipo de Vista
 	
-	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 3500.0);
+	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 3000.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
 	glLoadIdentity();
@@ -1391,6 +1446,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 				texturas_casa_terror();
 				terror = true;
 				PlaySound(NULL, NULL, 0);
+				PlayMozart();
 			}
 			break;
 
@@ -1446,12 +1502,12 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
-		objCamera.UpDown_Camera(CAMERASPEED);
+		objCamera.UpDown_Camera(CAMERASPEED*10);
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
 		//if (objCamera.mPos.y>3)
-			objCamera.UpDown_Camera(-CAMERASPEED);
+			objCamera.UpDown_Camera(-CAMERASPEED*10);
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
