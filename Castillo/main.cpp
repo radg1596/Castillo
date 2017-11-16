@@ -137,6 +137,10 @@ CTexture textTreeV;
 CTexture textTree0;
 CTexture textTree1;
 
+/////PERSONAJES///////
+CTexture textFantasma;
+
+
 /////////////CFiguras interior de la casa/////////////////
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
@@ -166,6 +170,8 @@ CFiguras cubo;
 CFiguras pasto;
 CFiguras mar;
 CFiguras camino;
+
+
 
 
 ///////////////////FIGURAS EN 3D///////////////////
@@ -1111,6 +1117,11 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textTree1.ReleaseImage();
 
 
+	///////PERSONAJES///////////
+	textFantasma.LoadTGA("texturas/fantasma.tga"); 
+	textFantasma.BuildGLTexture();
+	textFantasma.ReleaseImage();
+
 	//END NEW//////////////////////////////
 
 	///////Modelos 3ds/////////
@@ -1173,13 +1184,31 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			///////PASTO_ISLAS////////////
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
-				//glDisable(GL_COLOR_MATERIAL);
+
 				//glTranslatef(0, 0, 0);
 				pasto.prisma_tablero(0.1, 80, 80, textGrass.GLindex, 50.0);
 				glTranslatef(190, 0, 10);
 				pasto.prisma_tablero(0.1, 280, 300, textGrass.GLindex, 50.0);
-				//Cup.GLrender(NULL, _SHADED, 1.0);
-				//glEnable(GL_COLOR_MATERIAL);
+
+				///Fantasma prueba
+				glDisable(GL_COLOR_MATERIAL);
+				glTranslatef(-150, 10, -15+angNubes*5);
+
+				glPushMatrix();//Cuerpo
+					glScalef(0.005, 0.005, 0.006);
+					Cup.GLrender(NULL, _SHADED, 1.0);
+				glPopMatrix();
+
+				glPushMatrix();//Cara
+					glTranslatef( 0, 0.5, 3.6);
+					glEnable(GL_ALPHA_TEST);
+					glAlphaFunc(GL_GREATER, 0.1);
+					cubo.prisma(2.5, 2.5, 0.0001, textFantasma.GLindex);
+					glDisable(GL_ALPHA_TEST);
+				glPopMatrix();
+				glEnable(GL_COLOR_MATERIAL);
+				//Termina fantasma de prueba
+
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
@@ -1197,10 +1226,10 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glScalef(1, 2, 1);
 
 				glPushMatrix(); //Parte A
-					for (i = 0; i < 12; i++) {
+					for (i = 0; i < 9; i++) {
 						for (j = 0; j < 7; j++) {
 							glPushMatrix();
-								glTranslatef(i * 20, 0, j*-20);
+								glTranslatef(i * 30, 0, j*-20);
 								glRotatef(angArboles, 0, 1, 0);
 								planos_cruzados(textTree.GLindex);
 							glPopMatrix();
@@ -1210,10 +1239,10 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 				glPushMatrix(); //Parte B
 					glTranslatef(0, 0, 45);
-					for (i = 0; i < 12; i++) {
+					for (i = 0; i < 9; i++) {
 						for (j = 0; j < 7; j++) {
 							glPushMatrix();
-								glTranslatef(i * 20, 0, j*+20);
+								glTranslatef(i * 30, 0, j*+20);
 								glRotatef(angArboles, 0, 1, 0);
 								planos_cruzados(textTree.GLindex);
 							glPopMatrix();
@@ -1231,6 +1260,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				camino.prisma_tablero(0.1, 300, 10, textPiedra.GLindex, 10.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
+
 			//CASA///////////////////
 			glPushMatrix(); //Casa completa
 				glTranslatef(0, 7.7, 0);
@@ -1446,7 +1476,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 				texturas_casa_terror();
 				terror = true;
 				PlaySound(NULL, NULL, 0);
-				PlayMozart();
+				//PlayMozart();
 			}
 			break;
 
