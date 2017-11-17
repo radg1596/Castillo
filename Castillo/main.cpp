@@ -2,8 +2,8 @@
 //************************************************************//
 //************************************************************//
 //************** Alumno (s): *********************************//
-//*************											******//
-//*************											******//
+//*************	Desiderio Gonzalez Ricardo Abraham		******//
+//*************Gutierrez Benitez David Fernando			******//
 //************************************************************//
 //************************************************************//
 
@@ -85,11 +85,38 @@ float trasladoPuerta = 0.0;
 float angNubes;
 float angFuego = 0;
 float angArboles = 0;
+//FANTASMAS/////
+float fantasma1X = 0, fantasma1Y = 0, fantasma1Z = 0;
+float fantasma2X = 0, fantasma2Y = 0, fantasma2Z = 0;
+float fantasma3X = 0, fantasma3Y = 0, fantasma3Z = 0;
+float angFantasma, angFantasma2, angFantasma3;
 
 
 ///////////////VARIABLES DE MAQUINAS DE ESTADO////////////
 bool estado0Arboles = true;
 bool estado1Arboles = false;
+//Fantasmas
+bool estado1Fantasma1=true;
+bool estado2Fantasma1=false;
+bool estado3Fantasma1=false;
+bool estado4Fantasma1=false;
+bool estado5Fantasma1=false;
+bool estado6Fantasma1 = false;
+
+bool estado1Fantasma2 = true;
+bool estado2Fantasma2 = false;
+bool estado3Fantasma2 = false;
+bool estado4Fantasma2 = false;
+bool estado5Fantasma2 = false;
+
+bool estado1Fantasma3 = true;
+bool estado2Fantasma3 = false;
+bool estado3Fantasma3 = false;
+bool estado4Fantasma3 = false;
+
+
+////temp
+bool playfantasma = false;
 
 ///TEXTURAS///////
 //Exterior
@@ -176,7 +203,7 @@ CFiguras camino;
 
 ///////////////////FIGURAS EN 3D///////////////////
 //****Interior casa********
-CModel  Cup; //Taza de cafe
+CModel  fantasma; //Taza de cafe
 
 //END NEW//////////////////////////////////////////
 
@@ -846,7 +873,7 @@ void texturas_casa_terror() {
 	textSChimenea.BuildGLTexture();
 	textSChimenea.ReleaseImage();
 
-	textFuego.LoadBMP("casa/Fuego.bmp");
+	textFuego.LoadTGA("casa/Fuego.tga");
 	textFuego.BuildGLTexture();
 	textFuego.ReleaseImage();
 
@@ -950,13 +977,80 @@ void PlayAire() {
 void PlayMozart() {
 	PlaySound(TEXT("sonidos/terror.wav"), NULL, SND_LOOP | SND_ASYNC);
 }
-//void PlayPuerta() {
-//	PlaySound(TEXT("puerta.wav"),NULL, SND_ASYNC);
-//}
+
 
 ///////SND_ASYNC hilo que reproduce una vez
 ////////SND_LOOP | SND_ASYNC reproduce en bucle y si hay otro sonido se detiene
 
+void texturaAleatoriaArbol(float i, float j) {
+
+	if (i > 4 && j > 3) {
+		planos_cruzados(textTree.GLindex);
+	}
+
+	if (i > 4 && j < 3) {
+		planos_cruzados(textTreeV.GLindex);
+	}
+
+	if (i < 4 && j > 3) {
+		planos_cruzados(textTreeN.GLindex);
+	}
+
+	if (i < 4 && j < 3) {
+		glPushMatrix();
+			glTranslatef(0, -1, 0);
+			planos_cruzados(textTreeN2.GLindex);
+		glPopMatrix();
+	}
+
+}
+
+void DibujaBosque() {
+	glScalef(1, 2, 1);
+	glPushMatrix(); //Parte A
+		for (i = 0; i < 9; i++) {
+			for (j = 0; j < 7; j++) {
+				glPushMatrix();
+					glTranslatef(i * 30, 0, j*-20);
+					glRotatef(angArboles, 0, 1, 0);
+					texturaAleatoriaArbol(i, j);
+				glPopMatrix();
+			}
+	}
+	glPopMatrix();
+
+	glPushMatrix(); //Parte B
+		glTranslatef(0, 0, 45);
+		for (i = 0; i < 9; i++) {
+			for (j = 0; j < 7; j++) {
+				glPushMatrix();
+					glTranslatef(i * 30, 0, j*+20);
+					glRotatef(angArboles, 0, 1, 0);
+					texturaAleatoriaArbol(i, j);
+				glPopMatrix();
+			}
+		}
+	glPopMatrix();
+}
+
+void DibujaFantasma() {
+	glDisable(GL_COLOR_MATERIAL);
+
+	glPushMatrix();//Cuerpo
+		glScalef(0.005, 0.005, 0.006);
+		fantasma.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+
+	glPushMatrix();//Cara
+		glTranslatef(0, 0.5, 3.6);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.1);
+		cubo.prisma(2.5, 2.5, 0.0001, textFantasma.GLindex);
+		glDisable(GL_ALPHA_TEST);
+	glPopMatrix();
+
+	glEnable(GL_COLOR_MATERIAL);
+}
 
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
@@ -981,6 +1075,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	//////EXTERIOR//////////
 
 	textGrass.LoadBMP("texturas/pasto.bmp");
+
 	textGrass.BuildGLTexture();
 	textGrass.ReleaseImage();
     
@@ -1092,6 +1187,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textEsfera5.ReleaseImage();
 
 ///////***ARBOLES FUERA DE CASA, CERCA///////
+
 	textTree.LoadTGA("texturas/tree.tga");
 	textTree.BuildGLTexture();
 	textTree.ReleaseImage();
@@ -1125,10 +1221,10 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	//END NEW//////////////////////////////
 
 	///////Modelos 3ds/////////
-	Cup._3dsLoad("modelos/Cup.3ds");
+	fantasma._3dsLoad("modelos/fantasma.3ds");
 
 
-	objCamera.Position_Camera(-6, 4.0f,-5, -6, 4.0f,0, 0, 1, 0); //Posision inicial de la camara
+	objCamera.Position_Camera(-6+250, 4.0f,-5, -6+250, 4.0f,0, 0, 1, 0); //Posision inicial de la camara
 
 	//NEW Iniciar variables de KeyFrames
 	for(int i=0; i<MAX_FRAMES; i++)
@@ -1175,9 +1271,9 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 			glPushMatrix(); //Creamos cielo
 				glDisable(GL_LIGHTING);
-					glTranslatef(0,499.5,0);
+					glTranslatef(0,2999.5,0);
 					glRotatef(angNubes, 0, 1, 0);
-					fig1.skybox_cielo(2000.0, 1000.0, 2000.0,text1.GLindex, textMar.GLindex, text1.GLindex, 1.0);
+					fig1.skybox_cielo(2500.0, 6000.0, 2500.0,text1.GLindex, textMar.GLindex, text1.GLindex, 1.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();	
 
@@ -1190,24 +1286,33 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glTranslatef(190, 0, 10);
 				pasto.prisma_tablero(0.1, 280, 300, textGrass.GLindex, 50.0);
 
-				///Fantasma prueba
-				glDisable(GL_COLOR_MATERIAL);
-				glTranslatef(-150, 10, -15+angNubes*5);
+				glEnable(GL_LIGHTING);
+			glPopMatrix();
 
-				glPushMatrix();//Cuerpo
-					glScalef(0.005, 0.005, 0.006);
-					Cup.GLrender(NULL, _SHADED, 1.0);
+			/////////FANTASMAS////////////
+			glPushMatrix();
+				glDisable(GL_LIGHTING);
+				glTranslatef(160, 10, 10);
+
+				glPushMatrix(); //Fantasma 1
+					glTranslatef(fantasma1X, fantasma1Y, fantasma1Z);
+					glRotatef(90 + angFantasma, 0, 1, 0);
+					DibujaFantasma();
 				glPopMatrix();
 
-				glPushMatrix();//Cara
-					glTranslatef( 0, 0.5, 3.6);
-					glEnable(GL_ALPHA_TEST);
-					glAlphaFunc(GL_GREATER, 0.1);
-					cubo.prisma(2.5, 2.5, 0.0001, textFantasma.GLindex);
-					glDisable(GL_ALPHA_TEST);
+				glTranslated(15, 0, 0);
+				glPushMatrix();//Fantasma 2
+					glTranslatef(fantasma2X, fantasma2Y, fantasma2Z);
+					glRotatef(angFantasma2, 0, 1, 0);
+					DibujaFantasma();
 				glPopMatrix();
-				glEnable(GL_COLOR_MATERIAL);
-				//Termina fantasma de prueba
+				
+				glTranslated(0, 0, -80);
+				glPushMatrix();//Fantasma 3
+					glTranslatef(fantasma3X, fantasma3Y, fantasma3Z);
+					glRotatef(angFantasma3, 0, 1, 0);
+					DibujaFantasma();
+				glPopMatrix();
 
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
@@ -1218,38 +1323,10 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			glPopMatrix();
 
 			////////BOSQUE///////
-
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
 				glTranslatef(55, -1, -10);
-
-				glScalef(1, 2, 1);
-
-				glPushMatrix(); //Parte A
-					for (i = 0; i < 9; i++) {
-						for (j = 0; j < 7; j++) {
-							glPushMatrix();
-								glTranslatef(i * 30, 0, j*-20);
-								glRotatef(angArboles, 0, 1, 0);
-								planos_cruzados(textTree.GLindex);
-							glPopMatrix();
-						}
-					}
-				glPopMatrix();
-
-				glPushMatrix(); //Parte B
-					glTranslatef(0, 0, 45);
-					for (i = 0; i < 9; i++) {
-						for (j = 0; j < 7; j++) {
-							glPushMatrix();
-								glTranslatef(i * 30, 0, j*+20);
-								glRotatef(angArboles, 0, 1, 0);
-								planos_cruzados(textTree.GLindex);
-							glPopMatrix();
-						}
-					}
-				glPopMatrix();
-
+				DibujaBosque();
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
@@ -1392,6 +1469,188 @@ void animacion()
 		
 	}
 
+	/////FANTASMA 1//////////
+	if (playfantasma)
+	{
+		if (estado1Fantasma1) //estado 1
+		{
+			fantasma1X ++;
+			if(fantasma1X>155)
+			{
+				estado1Fantasma1 = false;
+				estado2Fantasma1 = true;
+			}
+		}
+	
+		if (estado2Fantasma1) //estado 2
+		{
+			angFantasma = 90;
+			fantasma1Z--;
+			if(fantasma1Z<= -125)
+			{
+				estado2Fantasma1 = false;
+				estado3Fantasma1 = true;
+			}
+		}
+
+		if (estado3Fantasma1) //estado 3
+		{
+			angFantasma = 190;
+			fantasma1X = fantasma1X - 2 * 0.62;
+			fantasma1Z = fantasma1Z + 2 * 0.25;
+			fantasma1Y = fantasma1Y + 0.62;
+			if (fantasma1X < 30) 
+			{
+				estado3Fantasma1 = false;
+				estado4Fantasma1 = true;
+			}
+		}
+
+		if (estado4Fantasma1) //estado 4
+		{
+			fantasma1X = fantasma1X - 2 * 0.62;
+			fantasma1Z = fantasma1Z + 2 * 0.25;
+			if (fantasma1X < -40 )
+			{
+				estado4Fantasma1 = false;
+				estado5Fantasma1 = true;
+			}
+		}
+
+		if (estado5Fantasma1) //estado 5
+		{
+			fantasma1X = fantasma1X -  0.70;
+			fantasma1Z = fantasma1Z + 2 * 0.223;
+			fantasma1Y = fantasma1Y - 0.62;
+			if (fantasma1Y <= -3.0)
+			{
+				estado5Fantasma1 = false;
+				estado6Fantasma1 = true;
+			}
+		}
+
+		if (estado6Fantasma1) //estado 6 
+		{
+			angFantasma = 0;
+			fantasma1X++;
+			if (fantasma1X > 0)
+			{
+				estado6Fantasma1 = false;
+				estado1Fantasma1 = true;
+			}
+		}
+
+	}
+
+	////FANTASMA 2
+
+	if (playfantasma)
+	{
+		if (estado1Fantasma2) //estado 1
+		{
+			angFantasma2 = 0;
+			fantasma2Z ++;
+			if(fantasma2Z>86)
+			{
+				estado1Fantasma2 = false;
+				estado2Fantasma2 = true;
+			}
+		}
+
+		if (estado2Fantasma2) //estado 2
+		{
+			angFantasma2 = 90;
+			fantasma2X++;
+			if(fantasma2X> 130)
+			{
+				estado2Fantasma2 = false;
+				estado3Fantasma2 = true;
+			}
+		}
+
+		if (estado3Fantasma2) //estado 3
+		{
+			angFantasma2 = 270;
+			fantasma2X --;
+			if (fantasma2X <= -130) 
+			{
+				estado3Fantasma2 = false;
+				estado4Fantasma2 = true;
+			}
+		}
+
+		if (estado4Fantasma2) //estado 4
+		{
+			angFantasma2 = 90;
+			fantasma2X ++;
+			if (fantasma2X >= 0 )
+			{
+				estado4Fantasma2 = false;
+				estado5Fantasma2 = true;
+			}
+		}
+
+		if (estado5Fantasma2) //estado 5
+		{
+			angFantasma2 = 180;
+			fantasma2Z --;
+			if (fantasma2Z <= 0)
+			{
+				estado5Fantasma2 = false;
+				estado1Fantasma2 = true;
+			}
+		}
+
+	}
+
+//////FANTASMA 3
+	if (playfantasma)
+	{
+		if (estado1Fantasma3) //estado 1
+		{
+			angFantasma3 = 270;
+			fantasma3X--;
+			if (fantasma3X<-130)
+			{
+				estado1Fantasma3 = false;
+				estado2Fantasma3 = true;
+			}
+		}
+
+		if (estado2Fantasma3) //estado 2
+		{
+			angFantasma3 = 0;
+			fantasma3Z++;
+			if (fantasma3Z> 80)
+			{
+				estado2Fantasma3 = false;
+				estado3Fantasma3 = true;
+			}
+		}
+
+		if (estado3Fantasma3) //estado 3
+		{
+			angFantasma3 = 90;
+			fantasma3X++;
+			if (fantasma3X >= 0)
+			{
+				estado3Fantasma3 = false;
+				estado4Fantasma3 = true;
+			}
+		}
+
+		if (estado4Fantasma3) //estado 4
+		{
+			angFantasma3 = 180;
+			fantasma3Z--;
+			if (fantasma3Z <= 0)
+			{
+				estado4Fantasma3 = false;
+				estado1Fantasma3 = true;
+			}
+		}
+
+	}
 
 	glutPostRedisplay();
 }
@@ -1410,7 +1669,7 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 	// Tipo de Vista
 	
-	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 3000.0);
+	glFrustum (-0.1, 0.1,-0.1, 0.1, 0.1, 6200.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
 	glLoadIdentity();
@@ -1423,8 +1682,10 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 	printf("%.2f \n", objCamera.mPos.z);
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
-		case 'W':
 				objCamera.Move_Camera(CAMERASPEED + 0.2);
+			break;
+		case 'W':
+				objCamera.Move_Camera(CAMERASPEED + 0.6);
 			break;
 
 		case 's':
@@ -1471,6 +1732,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'z':						
 		case 'Z':
+			//Interaccion regalo
 			if (objCamera.mPos.z > -7 && objCamera.mPos.z < -1 && objCamera.mPos.x>0 && objCamera.mPos.x<6)
 			{
 				texturas_casa_terror();
@@ -1478,13 +1740,10 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 				PlaySound(NULL, NULL, 0);
 				//PlayMozart();
 			}
-			break;
-
-		case 'q':						
-		case 'Q':
+			//Interaccion puerta
 			if (objCamera.mPos.z >3 && objCamera.mPos.z < 14 && objCamera.mPos.x>10 && objCamera.mPos.x < 19) {
-				if (puertaAbierta == true ) {
-					if 	(trasladoPuerta > 0.0)
+				if (puertaAbierta == true) {
+					if (trasladoPuerta > 0.0)
 						trasladoPuerta -= 1.0;
 					else
 						puertaAbierta = false;
@@ -1496,6 +1755,11 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 						puertaAbierta = true;
 				}
 			}
+			break;
+
+		case 'x':						
+		case 'X':
+			playfantasma = !playfantasma;
 			break;
 
 		case 'h':						
@@ -1611,7 +1875,7 @@ int main ( int argc, char** argv )   // Main Function
   glutInitWindowSize  (500, 500);	// Tamaño de la Ventana
   glutInitWindowPosition (0, 0);	//Posicion de la Ventana
   glutCreateWindow    ("Proyecto Final"); // Nombre de la Ventana
-  //glutFullScreen     ( );         // Full Screen
+ // glutFullScreen     ( );         // Full Screen
   InitGL ();						// Parametros iniciales de la aplicacion
   glutDisplayFunc     ( display );  //Indicamos a Glut función de dibujo
   glutReshapeFunc     ( reshape );	//Indicamos a Glut función en caso de cambio de tamano
