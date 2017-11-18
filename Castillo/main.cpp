@@ -12,7 +12,12 @@
 #include "Camera.h"
 #include "Windows.h"
 #include "cmodel/CModel.h"
+#include "stdlib.h"
 
+///ARCHIVO/////
+FILE *ap,*escribir;
+////RECORRIDO////
+char c;
 
 ///////Contadores////////
 float i = 0, j = 0;
@@ -36,6 +41,12 @@ typedef struct _frame
 	float incX;		//Variable para IncrementoX
 	float incY;		//Variable para IncrementoY
 	float incZ;		//Variable para IncrementoZ
+	float viewX;
+	float viewY;
+	float viewZ;
+	float IncviewX;
+	float IncviewY;
+	float incviewZ;
 }FRAME;
 
 FRAME KeyFrame[MAX_FRAMES];
@@ -89,7 +100,8 @@ float angArboles = 0;
 float fantasma1X = 0, fantasma1Y = 0, fantasma1Z = 0;
 float fantasma2X = 0, fantasma2Y = 0, fantasma2Z = 0;
 float fantasma3X = 0, fantasma3Y = 0, fantasma3Z = 0;
-float angFantasma, angFantasma2, angFantasma3;
+float fantasma4X = 0, fantasma4Y = 0, fantasma4Z = 0;
+float angFantasma, angFantasma2, angFantasma3, angFantasma4;
 
 
 ///////////////VARIABLES DE MAQUINAS DE ESTADO////////////
@@ -114,6 +126,10 @@ bool estado2Fantasma3 = false;
 bool estado3Fantasma3 = false;
 bool estado4Fantasma3 = false;
 
+bool estado1Fantasma4 = true;
+bool estado2Fantasma4 = false;
+bool estado3Fantasma4 = false;
+bool estado4Fantasma4 = false;
 
 ////temp
 bool playfantasma = false;
@@ -202,8 +218,7 @@ CFiguras camino;
 
 
 ///////////////////FIGURAS EN 3D///////////////////
-//****Interior casa********
-CModel  fantasma; //Taza de cafe
+CModel  fantasma; 
 
 //END NEW//////////////////////////////////////////
 
@@ -215,22 +230,42 @@ CFiguras paredf; //pared frontal
 
 void saveFrame ( void )
 {
-	
+	KeyFrame[FrameIndex].posX = objCamera.mPos.x;
+	KeyFrame[FrameIndex].posY = objCamera.mPos.y;
+	KeyFrame[FrameIndex].posZ = objCamera.mPos.z;
+
+	KeyFrame[FrameIndex].viewX = objCamera.mView.x;
+	KeyFrame[FrameIndex].viewY = objCamera.mView.y;
+	KeyFrame[FrameIndex].viewZ = objCamera.mView.z;
+
 	printf("frameindex %d\n",FrameIndex);			
-			
+
+
 	FrameIndex++;
 }
 
 void resetElements( void )
 {
 
+	objCamera.mPos.x = KeyFrame[0].posX;
+	objCamera.mPos.y = KeyFrame[0].posY;
+	objCamera.mPos.z = KeyFrame[0].posZ;
+
+	objCamera.mView.x = KeyFrame[0].viewX;
+	objCamera.mView.y = KeyFrame[0].viewY;
+	objCamera.mView.z = KeyFrame[0].viewZ;
 
 }
 
 void interpolation ( void )
 {
-	
+	KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;
+	KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;
+	KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;
 
+	KeyFrame[playIndex].IncviewX = (KeyFrame[playIndex + 1].viewX - KeyFrame[playIndex].viewX) / i_max_steps;
+	KeyFrame[playIndex].IncviewY = (KeyFrame[playIndex + 1].viewY - KeyFrame[playIndex].viewY) / i_max_steps;
+	KeyFrame[playIndex].incviewZ = (KeyFrame[playIndex + 1].viewZ - KeyFrame[playIndex].viewZ) / i_max_steps;
 }
 
 
@@ -1052,6 +1087,144 @@ void DibujaFantasma() {
 	glEnable(GL_COLOR_MATERIAL);
 }
 
+
+void keyboardSimulado(char simkey)  // Create Keyboard Function
+{
+	switch (simkey) {
+	case 'w':   //Movimientos de camara
+		objCamera.Move_Camera(CAMERASPEED + 0.2);
+		break;
+	case 'W':
+		objCamera.Move_Camera(CAMERASPEED + 0.6);
+		break;
+
+	case 's':
+	case 'S':
+		objCamera.Move_Camera(-(CAMERASPEED + 0.2));
+		break;
+
+	case 'a':
+	case 'A':
+		objCamera.Strafe_Camera(-(CAMERASPEED + 0.4));
+		break;
+
+	case 'd':
+	case 'D':
+		objCamera.Strafe_Camera(CAMERASPEED + 0.4);
+		break;
+
+	case 'k':		//
+	case 'K':
+		if (FrameIndex<MAX_FRAMES)
+		{
+			saveFrame();
+		}
+		break;
+
+	case 'l':
+	case 'L':
+		if (play == false && (FrameIndex>1))
+		{
+
+			resetElements();
+			//First Interpolation				
+			interpolation();
+
+			play = true;
+			playIndex = 0;
+			i_curr_steps = 0;
+		}
+		else
+		{
+			play = false;
+		}
+		break;
+
+	case 'z':
+	case 'Z':
+		//Interaccion regalo
+		if (objCamera.mPos.z > -7 && objCamera.mPos.z < -1 && objCamera.mPos.x>0 && objCamera.mPos.x<6)
+		{
+			texturas_casa_terror();
+			terror = true;
+			PlaySound(NULL, NULL, 0);
+			//PlayMozart();
+		}
+		//Interaccion puerta
+		if (objCamera.mPos.z >3 && objCamera.mPos.z < 14 && objCamera.mPos.x>10 && objCamera.mPos.x < 19) {
+			if (puertaAbierta == true) {
+				if (trasladoPuerta > 0.0)
+					trasladoPuerta -= 1.0;
+				else
+					puertaAbierta = false;
+			}
+			else {
+				if (trasladoPuerta < 4.0)
+					trasladoPuerta += 1.0;
+				else
+					puertaAbierta = true;
+			}
+		}
+		break;
+
+	case 'x':
+	case 'X':
+		playfantasma = !playfantasma;
+		break;
+
+	case 'c':
+	case 'C':
+		break;
+
+	case 'j':
+	case 'J':
+		break;
+
+	case 'b':
+		break;
+
+	case 'B':
+		break;
+
+	case 'p':
+		break;
+
+	case 'P':
+		break;
+
+	case '1':
+		g_lookupdown -= 1.0f;	
+		break;
+
+	case '2':
+		objCamera.Rotate_View(-CAMERASPEED);
+		break;
+
+	case '3':
+		objCamera.Rotate_View(CAMERASPEED);
+		break;
+
+	case '4':
+		g_lookupdown += 1.0f;
+		break;
+
+	case '5':
+		objCamera.UpDown_Camera(CAMERASPEED * 10);
+		break;
+
+	case '6':
+		objCamera.UpDown_Camera(-CAMERASPEED * 10);
+		break;
+
+	case 27:        // Cuando Esc es presionado...
+		exit(0);   // Salimos del programa
+		break;
+	default:        // Cualquier otra
+		break;
+	}
+
+}
+
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
@@ -1235,6 +1408,13 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 		KeyFrame[i].incX =0;
 		KeyFrame[i].incY =0;
 		KeyFrame[i].incZ =0;
+
+		KeyFrame[i].viewX = 0;
+		KeyFrame[i].viewY = 0;
+		KeyFrame[i].viewZ = 0;
+		KeyFrame[i].IncviewX = 0;
+		KeyFrame[i].IncviewY = 0;
+		KeyFrame[i].incviewZ = 0;
 	}
 	//NEW//////////////////NEW//////////////////NEW///////////
 
@@ -1290,33 +1470,42 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			glPopMatrix();
 
 			/////////FANTASMAS////////////
-			glPushMatrix();
-				glDisable(GL_LIGHTING);
-				glTranslatef(160, 10, 10);
+			if (terror == true) {
+				playfantasma = true;
+				glPushMatrix();
+					glDisable(GL_LIGHTING);
+					glTranslatef(160, 10, 10);
 
-				glPushMatrix(); //Fantasma 1
-					glTranslatef(fantasma1X, fantasma1Y, fantasma1Z);
-					glRotatef(90 + angFantasma, 0, 1, 0);
-					DibujaFantasma();
+					glPushMatrix(); //Fantasma 1
+						glTranslatef(fantasma1X, fantasma1Y, fantasma1Z);
+						glRotatef(90 + angFantasma, 0, 1, 0);
+						DibujaFantasma();
+					glPopMatrix();
+
+					glTranslated(15, 0, 0);
+					glPushMatrix();//Fantasma 2
+						glTranslatef(fantasma2X, fantasma2Y, fantasma2Z);
+						glRotatef(angFantasma2, 0, 1, 0);
+						DibujaFantasma();
+					glPopMatrix();
+
+					glTranslated(0, 0, -80);
+					glPushMatrix();//Fantasma 3
+						glTranslatef(fantasma3X, fantasma3Y, fantasma3Z);
+						glRotatef(angFantasma3, 0, 1, 0);
+						DibujaFantasma();
+					glPopMatrix();
+
+					glTranslated(-105, 0, -60);
+					glPushMatrix();//Fantasma 4
+						glTranslatef(fantasma4X, fantasma4Y, fantasma4Z);
+						glRotatef(angFantasma4, 0, 1, 0);
+						DibujaFantasma();
+					glPopMatrix();
+
+					glEnable(GL_LIGHTING);
 				glPopMatrix();
-
-				glTranslated(15, 0, 0);
-				glPushMatrix();//Fantasma 2
-					glTranslatef(fantasma2X, fantasma2Y, fantasma2Z);
-					glRotatef(angFantasma2, 0, 1, 0);
-					DibujaFantasma();
-				glPopMatrix();
-				
-				glTranslated(0, 0, -80);
-				glPushMatrix();//Fantasma 3
-					glTranslatef(fantasma3X, fantasma3Y, fantasma3Z);
-					glRotatef(angFantasma3, 0, 1, 0);
-					DibujaFantasma();
-				glPopMatrix();
-
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
-
+			}
 			////////ARBOLES CASA-COLINDANTES
 			glPushMatrix();
 				DibujaArbolesCasa();
@@ -1411,9 +1600,18 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 void animacion()
 {
+	/////Recorrido
+	//fprintf(escribir, "c"); //Silencio del teclado
+	//c = fgetc(ap);
+	//if (c != -1) {
+	//	keyboardSimulado(c);
+	//}
+
 	///////*******NUBES*********////////////
-	if (terror == false)
+	if (terror == false) {
 		angNubes += 0.01;
+	}
+		
 
 	//////*********FUEGO******//////////////
 	angFuego += 45.0;
@@ -1437,7 +1635,7 @@ void animacion()
 		}
 	}
 
-	//Movimiento del monito
+	//Movimiento recorrido virtual
 
 	if(play)
 	{		
@@ -1462,7 +1660,13 @@ void animacion()
 		else
 		{
 			//Draw animation
+			objCamera.mPos.x += KeyFrame[playIndex].incX;
+			objCamera.mPos.y += KeyFrame[playIndex].incY;
+			objCamera.mPos.z += KeyFrame[playIndex].incZ;
 
+			objCamera.mView.x += KeyFrame[playIndex].viewX;
+			objCamera.mView.y += KeyFrame[playIndex].viewY;
+			objCamera.mView.z += KeyFrame[playIndex].viewZ;
 
 			i_curr_steps++;
 		}
@@ -1652,6 +1856,55 @@ void animacion()
 
 	}
 
+	//////FANTASMA 4
+	if (playfantasma)
+	{
+		if (estado1Fantasma4) //estado 1
+		{
+			angFantasma4 = 0;
+			fantasma4Z++;
+			if (fantasma4Z>275)
+			{
+				estado1Fantasma4 = false;
+				estado2Fantasma4 = true;
+			}
+		}
+
+		if (estado2Fantasma4) //estado 2
+		{
+			angFantasma4 = 90;
+			fantasma4X++;
+			if (fantasma4X> 240)
+			{
+				estado2Fantasma4 = false;
+				estado3Fantasma4 = true;
+			}
+		}
+
+		if (estado3Fantasma4) //estado 3
+		{
+			angFantasma4 = 180;
+			fantasma4Z--;
+			if (fantasma4Z <= 10)
+			{
+				estado3Fantasma4 = false;
+				estado4Fantasma4 = true;
+			}
+		}
+
+		if (estado4Fantasma4) //estado 4
+		{
+			angFantasma4 = 270;
+			fantasma4X--;
+			if (fantasma4X <= 0)
+			{
+				estado4Fantasma4 = false;
+				estado1Fantasma4 = true;
+			}
+		}
+
+	}
+
 	glutPostRedisplay();
 }
 
@@ -1683,6 +1936,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 				objCamera.Move_Camera(CAMERASPEED + 0.2);
+				fprintf(escribir, "w");
 			break;
 		case 'W':
 				objCamera.Move_Camera(CAMERASPEED + 0.6);
@@ -1691,16 +1945,19 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 's':
 		case 'S':
 			objCamera.Move_Camera(-(CAMERASPEED+0.2));
+			fprintf(escribir, "s");
 			break;
 
 		case 'a':
 		case 'A':
 			objCamera.Strafe_Camera(-(CAMERASPEED+0.4));
+			fprintf(escribir, "a");
 			break;
 
 		case 'd':
 		case 'D':
 			objCamera.Strafe_Camera( CAMERASPEED+0.4 );
+			fprintf(escribir, "d");
 			break;
 
 		case 'k':		//
@@ -1733,6 +1990,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'z':						
 		case 'Z':
 			//Interaccion regalo
+			fprintf(escribir, "z");
 			if (objCamera.mPos.z > -7 && objCamera.mPos.z < -1 && objCamera.mPos.x>0 && objCamera.mPos.x<6)
 			{
 				texturas_casa_terror();
@@ -1759,11 +2017,13 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'x':						
 		case 'X':
+			fprintf(escribir, "x");
 			playfantasma = !playfantasma;
 			break;
 
-		case 'h':						
-		case 'H':
+		case 'c':						
+		case 'C':
+			fprintf(escribir, "c");
 			break;
 
 		case 'j':						
@@ -1792,32 +2052,39 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
   glutPostRedisplay();
 }
 
+
 void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas especiales (arrow keys)
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
 		objCamera.UpDown_Camera(CAMERASPEED*10);
+		fprintf(escribir, "5");
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
 		//if (objCamera.mPos.y>3)
 			objCamera.UpDown_Camera(-CAMERASPEED*10);
+			fprintf(escribir, "6");
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
 		g_lookupdown -= 1.0f;
+		fprintf(escribir, "1");
 		break;
 
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
 		g_lookupdown += 1.0f;
+		fprintf(escribir, "2");
 		break;
 
 	case GLUT_KEY_LEFT:
 		objCamera.Rotate_View(-CAMERASPEED);
+		fprintf(escribir, "2");
 		break;
 
 	case GLUT_KEY_RIGHT:
 		objCamera.Rotate_View( CAMERASPEED);
+		fprintf(escribir, "3");
 		break;
 
     default:
@@ -1869,6 +2136,9 @@ void menu( int id)
 
 int main ( int argc, char** argv )   // Main Function
 {
+  //Archivo
+  ap = fopen("recorrido.txt", "r+");
+  escribir = fopen("escribir.txt", "w+");
   int submenu;
   glutInit            (&argc, argv); // Inicializamos OpenGL
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
