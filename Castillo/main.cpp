@@ -85,9 +85,10 @@ GLfloat m_amb2[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
 GLfloat m_s2[] = {22};
 
 //////DESICIONES IMPORTANTES/////////
-bool terror = false;
+bool terror = true;
 bool puertaAbierta=false;
 bool recorrido = false;
+bool organo =true;
 
 
 ////////////VARIABLES DE ROTACION Y TRASLADO////////////////////
@@ -107,6 +108,9 @@ float despGuillotina, despCabezaGuillotinaZ, despCabezaGuillotinaY, guillotinaPa
 //EMPALADO
 float angBrazoDerEmpalado, angBrazoIzqEmpalado;
 float angPiernaDerEmpalado, angPiernaIzqEmpalado;
+//MOMIA
+float angPiernaDerMomia, angPiernaIzqMomia, giroMomia;
+float MomiaZ=-5.0, MomiaX;
 
 ///////////////VARIABLES DE MAQUINAS DE ESTADO////////////
 bool estado0Arboles = true;
@@ -135,15 +139,29 @@ bool estado2Fantasma4 = false;
 bool estado3Fantasma4 = false;
 bool estado4Fantasma4 = false;
 
+//GUILLOTINA
 bool estado1Guillotina = true;
 bool estado2Guillotina = false;
 bool estado3Guillotina = false;
 bool estado4Guillotina = false;
 bool estado5Guillotina = false;
 
+/////MOMIA 
+//pies
+bool estado1Pmomia = true;
+bool estado2Pmomia = false;
+//desplazamiento
+bool estado1Momia = true;
+bool estado2Momia = false;
+bool estado3Momia = false;
+bool estado4Momia = false;
+bool estado5Momia = false;
+bool estado6Momia = false;
+//MOMIA TRASLADO
 ////temp
 bool playfantasma = false;
 bool playGuillotina = false;
+bool playMomia = false;
 
 ////////////////////////TEXTURAS/////////////////////////
 //Exterior
@@ -193,6 +211,8 @@ CTexture textTree1;
 CTexture textFantasma;
 CTexture textPelo;
 CTexture textpiel;
+CTexture textCarnePodrida;
+CTexture textVenda;
 
 ///CASTILLO
 CTexture textBarrote;
@@ -209,8 +229,7 @@ CTexture sangre;
 CTexture metal;
 CTexture tierra;
 
-/////PERSONAJES////
-CTexture textCarnePodrida;
+
 /////////////CFiguras interior de la casa/////////////////
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
@@ -1035,9 +1054,12 @@ void PlayAire() {
 }
 
 void PlayMozart() {
-	PlaySound(TEXT("sonidos/terror.wav"), NULL, SND_LOOP | SND_ASYNC);
+	PlaySound(TEXT("sonidos/terror.wav"), NULL, SND_ASYNC);
 }
 
+void PlayBach() {
+	PlaySound(TEXT("sonidos/terror2.wav"), NULL, SND_ASYNC | SND_ASYNC);
+}
 
 ///////SND_ASYNC hilo que reproduce una vez
 ////////SND_LOOP | SND_ASYNC reproduce en bucle y si hay otro sonido se detiene
@@ -1321,6 +1343,7 @@ void prisma(GLuint textura1, GLuint textura2)  //Funcion creacion prisma
 
 
 void ropero(void) {
+glPushMatrix();
 	glPushMatrix();
 		glTranslatef(-8, -20, 50);
 		fig5.prisma(50.0, 1.0, 30.0, textMarble.GLindex);
@@ -1379,6 +1402,7 @@ void ropero(void) {
 		glTranslatef(-5.5, -10, 61);
 		fig5.prisma(0.5, 6.0, 7.5, textMarble.GLindex);
 	glPopMatrix();
+glPopMatrix();
 }
 
 void monito(GLuint textura) //se modifico
@@ -1449,6 +1473,99 @@ void monito(GLuint textura) //se modifico
 	glPushMatrix(); //Pie Izquierdo -->
 	glTranslatef(-0.75, -0.5, 0);
 	glRotatef(-5, 1, 0, 0);
+	glTranslatef(0, -0.5, 0);
+	fig7.prisma(1.0, 0.5, 1, textura);
+
+	glPushMatrix();
+	glTranslatef(0, -0.5, 0);
+	glRotatef(15 + 0, 1, 0, 0);
+	glTranslatef(0, -0.75, 0);
+	fig7.prisma(1.5, 0.5, 1, textura);
+
+	glPushMatrix();
+	glTranslatef(0, -0.75, 0.3);
+	fig7.prisma(0.2, 1.2, 1.5, textura);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+
+
+	glPopMatrix();
+
+
+	glColor3f(1, 1, 1);
+	glPopMatrix();
+
+}
+
+void momia(GLuint textura) //se modifico
+{
+	//glNewList(1, GL_COMPILE);
+	glPushMatrix();//Pecho
+	glScalef(0.5, 0.5, 0.5);
+	fig7.prisma(2.0, 2.0, 1, textura);
+
+	glPushMatrix();//Cuello
+	glTranslatef(0, 1.0, 0.0);
+	fig7.cilindro(0.25, 0.25, 15, textura);
+	glPushMatrix();//Cabeza
+	glTranslatef(0, 1.0, 0);
+	fig7.esfera(0.75, 15, 15, textura);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPushMatrix(); //Brazo derecho--> //se modifico
+	glTranslatef(1.25, 0.65, 0);
+	fig7.esfera(0.5, 12, 12, textura);
+	glPushMatrix();
+	glTranslatef(0.25, 0, 0);
+	glRotatef(-90 + 0, 0, 1, 0);  //agregado
+	glTranslatef(0.75, 0, 0);
+	fig7.prisma(0.7, 1.5, 0.7, textura);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPushMatrix(); //Brazo izquierdo <-- //se modifico
+	glTranslatef(-1.25, 0.65, 0);
+	fig7.esfera(0.5, 12, 12, textura);
+	glPushMatrix();
+	glTranslatef(-0.25, 0, 0);
+	glRotatef(90, 0, 1, 0);
+	//glRotatef(25, 0, 0, 1);
+	//glRotatef(25 + 0, 0, 1, 0);  //agregado
+	glTranslatef(-0.75, 0, 0);
+	fig7.prisma(0.7, 1.5, 0.7, textura);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPushMatrix();//Cintura
+	glTranslatef(0, -1.5, 0);
+	fig7.prisma(1, 2, 1, textura);
+
+	glPushMatrix(); //Pie Derecho -->
+	glTranslatef(0.75, -0.5, 0);
+	glRotatef(-15+angPiernaDerMomia, 1, 0, 0);
+	glTranslatef(0, -0.5, 0);
+	fig7.prisma(1.0, 0.5, 1, textura);
+
+	glPushMatrix();
+	glTranslatef(0, -0.5, 0);
+	glRotatef(15 + 0, 1, 0, 0);
+	glTranslatef(0, -0.75, 0);
+	fig7.prisma(1.5, 0.5, 1, textura);
+
+	glPushMatrix();
+	glTranslatef(0, -0.75, 0.3);
+	fig7.prisma(0.2, 1.2, 1.5, textura);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPopMatrix();
+
+
+	glPushMatrix(); //Pie Izquierdo -->
+	glTranslatef(-0.75, -0.5, 0);
+	glRotatef(-5+angPiernaIzqMomia, 1, 0, 0);
 	glTranslatef(0, -0.5, 0);
 	fig7.prisma(1.0, 0.5, 1, textura);
 
@@ -1642,10 +1759,8 @@ void castillo()
 {
 	glDisable(GL_LIGHTING);
 	glPushMatrix();
-		//castillo
-
+		//castillo			
 		glPushMatrix();
-			
 			glTranslatef(0, 12.5, 0);
 			glPushMatrix();
 				glEnable(GL_ALPHA_TEST);
@@ -1691,8 +1806,8 @@ void castillo()
 			//pasto
 			glPushMatrix();
 				glTranslatef(0.0, -6.0, 30.0);
-				glScalef(290.0, 0.01, 250.0);
-				prisma(textGrass.GLindex, textGrass.GLindex);
+				//glScalef(290.0, 0.01, 250.0);
+				cubo.prisma_tablero(0.01, 290.0, 250.0, textGrass.GLindex, 40.0);
 			glPopMatrix();
 
 			//techo
@@ -1843,7 +1958,6 @@ void castillo()
 				glScalef(5.0, 3.0, 1.0);
 				prisma(textBarrote.GLindex, textBarrote.GLindex);
 			glPopMatrix();
-
 			//Monito guillotina
 			glPushMatrix();
 				glTranslatef(-13.0, -0.7, 8.7);
@@ -1903,7 +2017,7 @@ void castillo()
 			////instrumento1
 			glPushMatrix();
 
-				glTranslatef(-16.0, 0.0, -16.0);
+				glTranslatef(-16.0, -1.0, -16.0);
 
 				glPushMatrix();
 					glTranslatef(0.0, 4.0, 0.0);
@@ -2200,8 +2314,9 @@ void castillo()
 		glPopMatrix();
 
 
-	glPopMatrix();
+	glPopMatrix();//pop de arquitectura del castillo
 
+	///Segundo piso
 	glPushMatrix();
 		mesa(1.0, 1.0, 1.0, 0.0, 12.5, 0.0);
 		glRotatef(30, 0.0, 1.0, 0.0);
@@ -2209,20 +2324,74 @@ void castillo()
 	glPopMatrix();
 
 	glPushMatrix();
-		glRotatef(45.0, 0.0, 1.0, 0.0);
-		dibujaCama(0.5, 0.5, 0.5, -15.0, 63.0, -20.0);
-		glRotatef(45.0, 0.0, 1.0, 0.0);
-		dibujaCama(0.5, 0.5, 0.5, -15.0, 63.0, 20.0);
-		glRotatef(45.0, 0.0, 1.0, 0.0);
-		dibujaBuro(0.5, 0.5, 0.5, 20.0, 63.0, -20.0);
-	glPopMatrix();
+		glTranslatef(0, 12.5, 0);
 
-	glPushMatrix();
-		glTranslatef(5.0, 33.0, 0.0);
-		glRotatef(-45, 0.0, 1.0, 0.0);
-		glScalef(0.5, 0.05, 0.5);
-		ropero();
-	glPopMatrix();
+		glPushMatrix();
+			glPushMatrix();
+				glRotatef(180, 0, 1, 0);
+				dibujaCama(0.5, 0.5, 0.5, 15.0, 63.0, -35.0);
+			glPopMatrix();
+
+			dibujaCama(0.5, 0.5, 0.5, -10.0, 63.0, -43);
+			dibujaCama(0.5, 0.5, 0.5, 15.0, 63.0, -43);
+
+			///Momia
+			glPushMatrix();
+				glTranslatef(0+MomiaX, 37.5, 0+MomiaZ);
+				glScalef(2.0, 3.0, 2.0);
+				glRotatef(giroMomia, 0, 1, 0);
+				momia(textVenda.GLindex);
+				if (playMomia == true) {
+					glTranslatef(0, 0, 0);
+					glScalef(0.1, 0.1, 0.1);
+					glRotatef(angFuego, 0, 1, 0);
+					planos_cruzados(textFuego.GLindex);
+				}
+			glPopMatrix();
+			
+			if (playMomia == true) {
+				glPushMatrix();//fuego
+
+					glPushMatrix();//1
+						glTranslatef(0, 29.5, 0);
+						glRotatef(angFuego, 0, 1, 0);
+						glScalef(0.4, 0.4, 0.4);
+						planos_cruzados(textFuego.GLindex);
+					glPopMatrix();
+
+					glPushMatrix();//2
+						glTranslatef(10, 33.0, -16);
+						glRotatef(angFuego, 0, 1, 0);
+						glScalef(0.4, 0.4, 0.4);
+						planos_cruzados(textFuego.GLindex);
+					glPopMatrix();
+
+					glPushMatrix();//3
+						glTranslatef(-10, 29.5, -10);
+						glRotatef(angFuego, 0, 1, 0);
+						glScalef(0.4, 0.4, 0.4);
+						planos_cruzados(textFuego.GLindex);
+					glPopMatrix();
+
+					glPushMatrix();//4
+						glTranslatef(-12, 33.0, 14);
+						glRotatef(angFuego, 0, 1, 0);
+						glScalef(0.4, 0.4, 0.4);
+						planos_cruzados(textFuego.GLindex);
+					glPopMatrix();
+
+					glPushMatrix();//5
+						glTranslatef(10, 29.5, 10);
+						glRotatef(angFuego, 0, 1, 0);
+						glScalef(0.4, 0.4, 0.4);
+						planos_cruzados(textFuego.GLindex);
+					glPopMatrix();
+				
+				glPopMatrix();
+			}
+
+		glPopMatrix();
+	glPopMatrix();//De muebles del segundo piso
 
 	glEnable(GL_LIGHTING);
 }
@@ -2750,6 +2919,10 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	textpiel.BuildGLTexture();
 	textpiel.ReleaseImage();
 
+	textVenda.LoadTGA("texturas/venda.tga");
+	textVenda.BuildGLTexture();
+	textVenda.ReleaseImage();
+
 
 	///////Modelos 3ds/////////
 	fantasma._3dsLoad("modelos/fantasma.3ds");
@@ -2840,15 +3013,15 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				//glTranslatef(0, 0, 0);
 				pasto_islas.prisma_tablero(0.1, 80, 80, textGrass.GLindex, 10.0);
 				glTranslatef(190, 0, 10);
-				pasto_islas.prisma_tablero(0.1, 280, 300, textGrass.GLindex, 10.0);
+				pasto_islas.prisma_tablero(0.1, 280, 300, textGrass.GLindex, 30.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
 			//////////CASTILLO/////////
 			if (terror == true) {
 				glPushMatrix();
-					glTranslatef(490, -6.9, 10);
-					//glTranslatef(190, 0, 10);
+					//glTranslatef(490, -6.9, 10);
+					glTranslatef(210, 0, 30);
 					glRotatef(270, 0, 1, 0);
 					castillo();
 				glPopMatrix();
@@ -3358,8 +3531,119 @@ void animacion()
 				estado5Guillotina = false;
 			}
 		}
+	}
 
+//////MOMIA
+	//piernas
+	if (playMomia)
+	{
+		if (estado1Pmomia) //estado 1
+		{
+			angPiernaDerMomia += 5.0;
+			angPiernaIzqMomia -= 5.0;
+			if (angPiernaDerMomia>35)
+			{
+				estado1Pmomia = false;
+				estado2Pmomia = true;
+			}
+		}
 
+		if (estado2Pmomia) //estado 2
+		{
+			angPiernaDerMomia -= 5.0;
+			angPiernaIzqMomia += 5.0;
+			if (angPiernaDerMomia< -35)
+			{
+				estado2Pmomia = false;
+				estado1Pmomia = true;
+			}
+		}
+
+	}
+	///DESP MOMIA
+
+	if (playMomia)
+	{
+		if (estado1Momia) //estado 1
+		{
+			MomiaZ += 0.1;
+			MomiaX = sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ>=-1.80)
+			{
+				giroMomia -= 20;
+				estado1Momia = false;
+				estado2Momia = true;
+			}
+		}
+
+		if (estado2Momia) //estado 2
+		{
+			MomiaZ += 0.1;
+			MomiaX = sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ >= 3.70)
+			{
+				giroMomia -= 50;
+				estado2Momia = false;
+				estado3Momia = true;
+			}
+		}
+
+		if (estado3Momia) //estado 3
+		{
+			MomiaZ += 0.1;
+			MomiaX = sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ >= 4.99)
+			{
+				giroMomia -= 50;
+				estado3Momia = false;
+				estado4Momia = true;
+			}
+		}
+
+		if (estado4Momia) //estado 4
+		{
+			giroMomia -= 1.0;
+			MomiaZ -= 0.1;
+			MomiaX = -sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ <= -0.8)
+			{
+				giroMomia -= 50;
+				estado4Momia = false;
+				estado5Momia = true;
+			}
+		}
+
+		if (estado5Momia) //estado 5
+		{
+			giroMomia -= 1.0;
+			MomiaZ -= 0.1;
+			MomiaX = -sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ <= -2.99)
+			{
+				giroMomia -= 30;
+				estado5Momia = false;
+				estado6Momia = true;
+			}
+		}
+
+		if (estado6Momia) //estado 5
+		{
+			giroMomia -= 1.0;
+			MomiaZ -= 0.1;
+			MomiaX = -sqrt((5 * 5) - MomiaZ*MomiaZ);
+
+			if (MomiaZ <= -4.99)
+			{
+				giroMomia = 0;
+				estado6Momia = false;
+				estado1Momia = true;
+			}
+		}
 	}
 
 	glutPostRedisplay();
@@ -3387,10 +3671,16 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
-	printf("%.2f \n", angBrazoDerEmpalado);
-	printf("%.2f \n", angBrazoIzqEmpalado);
-	printf("%.2f \n", angPiernaDerEmpalado);
-	printf("%.2f \n", angPiernaIzqEmpalado);
+	//printf("%.2f \n", objCamera.mPos.x);
+	//printf("%.2f \n", objCamera.mPos.y);
+	//printf("%.2f \n", objCamera.mPos.x);
+	printf("%.2f \n", MomiaZ);
+	printf("%.2f \n", giroMomia);
+	if (objCamera.mPos.x>54 && terror==true && organo==true) {
+		organo = false;
+		PlayBach();
+	}
+
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 				objCamera.Move_Camera(CAMERASPEED + 0.6);
@@ -3455,7 +3745,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 				texturas_casa_terror();
 				terror = true;
 				PlaySound(NULL, NULL, 0);
-				//PlayMozart();
+				PlayMozart();
 			}
 			//Interaccion puerta
 			if (objCamera.mPos.z >3 && objCamera.mPos.z < 14 && objCamera.mPos.x>10 && objCamera.mPos.x < 19) {
@@ -3477,7 +3767,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'x':						
 		case 'X':
 			fprintf(escribir, "x");
-			playGuillotina = !playGuillotina;
+			playMomia = !playMomia;
 			break;
 
 		case 'c':						
@@ -3489,6 +3779,14 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			if (recorrido==false)
 				objCamera.Position_Camera(-6 + 250, 4.0f, -5, -6 + 250, 4.0f, 0, 0, 1, 0);
 			recorrido = true;
+			break;
+
+		case 'v':
+			playGuillotina = !playGuillotina;
+			break;
+
+		case 'V':
+			giroMomia -= 10.0;
 			break;
 
 		case 27:        // Cuando Esc es presionado...
