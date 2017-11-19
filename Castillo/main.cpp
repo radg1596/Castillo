@@ -49,7 +49,7 @@ typedef struct _frame
 }FRAME;
 
 FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex=0;			//introducir datos
+int FrameIndex=4;			//introducir datos
 bool play=false;
 int playIndex=0;
 
@@ -85,8 +85,9 @@ GLfloat m_amb2[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
 GLfloat m_s2[] = {22};
 
 //////DESICIONES IMPORTANTES/////////
-bool terror = true;
+bool terror = false;
 bool puertaAbierta=false;
+bool recorrido = false;
 
 
 ////////////VARIABLES DE ROTACION Y TRASLADO////////////////////
@@ -1116,7 +1117,7 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 {
 	switch (simkey) {
 	case 'w':   //Movimientos de camara
-		objCamera.Move_Camera(CAMERASPEED + 0.2);
+		objCamera.Move_Camera(CAMERASPEED + 0.6);
 		break;
 	case 'W':
 		objCamera.Move_Camera(CAMERASPEED + 0.6);
@@ -1124,17 +1125,17 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 
 	case 's':
 	case 'S':
-		objCamera.Move_Camera(-(CAMERASPEED + 0.2));
+		objCamera.Move_Camera(-(CAMERASPEED + 0.6));
 		break;
 
 	case 'a':
 	case 'A':
-		objCamera.Strafe_Camera(-(CAMERASPEED + 0.4));
+		objCamera.Strafe_Camera(-(CAMERASPEED + 0.6));
 		break;
 
 	case 'd':
 	case 'D':
-		objCamera.Strafe_Camera(CAMERASPEED + 0.4);
+		objCamera.Strafe_Camera(CAMERASPEED + 0.6);
 		break;
 
 	case 'k':		//
@@ -1193,7 +1194,7 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 
 	case 'x':
 	case 'X':
-		playfantasma = !playfantasma;
+		playGuillotina = true;
 		break;
 
 	case 'c':
@@ -1233,11 +1234,11 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 		break;
 
 	case '5':
-		objCamera.UpDown_Camera(CAMERASPEED * 10);
+		objCamera.UpDown_Camera(CAMERASPEED );
 		break;
 
 	case '6':
-		objCamera.UpDown_Camera(-CAMERASPEED * 10);
+		objCamera.UpDown_Camera(-CAMERASPEED );
 		break;
 
 	case 27:        // Cuando Esc es presionado...
@@ -2771,6 +2772,29 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	}
 	//NEW//////////////////NEW//////////////////NEW///////////
 
+	//////ANIMACION DE MONITO EMPALADO////////
+	//frame 1
+	KeyFrame[0].angBrazoDerEmpalado = 0;
+	KeyFrame[0].angBrazoIzqEmpalado = 0;
+	KeyFrame[0].angPiernaDerEmpalado = 0;
+	KeyFrame[0].angPiernaIzqEmpalado = 0;
+
+	KeyFrame[1].angBrazoDerEmpalado = 30;
+	KeyFrame[1].angBrazoIzqEmpalado = -108;
+	KeyFrame[1].angPiernaDerEmpalado = -21;
+	KeyFrame[1].angPiernaIzqEmpalado = 0;
+
+	KeyFrame[2].angBrazoDerEmpalado = 62;
+	KeyFrame[2].angBrazoIzqEmpalado = 9;
+	KeyFrame[2].angPiernaDerEmpalado = 12;
+	KeyFrame[2].angPiernaIzqEmpalado = -25;
+
+	KeyFrame[3].angBrazoDerEmpalado = -42;
+	KeyFrame[3].angBrazoIzqEmpalado = -51;
+	KeyFrame[3].angPiernaDerEmpalado = 24;
+	KeyFrame[3].angPiernaIzqEmpalado = 26;
+
+
 }
 
 void pintaTexto(float x, float y, float z, void *font,char *string)
@@ -2823,8 +2847,8 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			//////////CASTILLO/////////
 			if (terror == true) {
 				glPushMatrix();
-					//glTranslatef(490, -6.9, 10);
-					glTranslatef(190, 0, 10);
+					glTranslatef(490, -6.9, 10);
+					//glTranslatef(190, 0, 10);
 					glRotatef(270, 0, 1, 0);
 					castillo();
 				glPopMatrix();
@@ -2885,12 +2909,12 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 			//////BOSQUE///////
 
-				//glPushMatrix();
-				//	glDisable(GL_LIGHTING);
-				//	glTranslatef(55, -1, -10);
-				//	DibujaBosque();
-				//	glEnable(GL_LIGHTING);
-				//glPopMatrix();
+				glPushMatrix();
+					glDisable(GL_LIGHTING);
+					glTranslatef(55, -1, -10);
+					DibujaBosque();
+					glEnable(GL_LIGHTING);
+				glPopMatrix();
 
 			//////CAMINO//////////
 			glPushMatrix();
@@ -2973,12 +2997,15 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 void animacion()
 {
-	/////Recorrido
-	//fprintf(escribir, "c"); //Silencio del teclado
-	//c = fgetc(ap);
-	//if (c != -1) {
-	//	keyboardSimulado(c);
-	//}
+	///
+	fprintf(escribir, "c");//silencio del teclado
+	if (recorrido == true) {
+		
+		c = fgetc(ap);
+		if (c != -1) {
+			keyboardSimulado(c);
+		}
+	}
 
 	///////*******NUBES*********////////////
 	if (terror == false) {
@@ -2990,7 +3017,7 @@ void animacion()
 	angFuego += 45.0;
 	
 	////////******ARBOLES******//////////////
-	if (estado0Arboles && terror==true) {
+	if (estado0Arboles && terror==false) {
 		if (angArboles<10.0)
 			angArboles += 8.0;
 		else {
@@ -2999,7 +3026,7 @@ void animacion()
 		}
 	}
 
-	if (estado1Arboles && terror==true) {
+	if (estado1Arboles && terror==false) {
 		if (angArboles>0.0)
 			angArboles -= 8.0;
 		else {
@@ -3360,9 +3387,10 @@ void reshape ( int width , int height )   // Creamos funcion Reshape
 
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
-	printf("%.2f \n", objCamera.mPos.x);
-	printf("%.2f \n", objCamera.mPos.y);
-	printf("%.2f \n", objCamera.mPos.z);
+	printf("%.2f \n", angBrazoDerEmpalado);
+	printf("%.2f \n", angBrazoIzqEmpalado);
+	printf("%.2f \n", angPiernaDerEmpalado);
+	printf("%.2f \n", angPiernaIzqEmpalado);
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 				objCamera.Move_Camera(CAMERASPEED + 0.6);
@@ -3390,16 +3418,17 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			fprintf(escribir, "d");
 			break;
 
-		case 'k':		//
-		case 'K':
-			if(FrameIndex<MAX_FRAMES)
-			{
-				saveFrame();
-			}
-			break;
+		//case 'k':		//
+		//case 'K':
+		//	if(FrameIndex<MAX_FRAMES)
+		//	{
+		//		saveFrame();
+		//	}
+		//	break;
 
 		case 'l':						
 		case 'L':
+			fprintf(escribir, "l");
 			if(play==false && (FrameIndex>1))
 			{
 
@@ -3456,35 +3485,10 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			fprintf(escribir, "c");
 			break;
 
-		case 'v':
-			angBrazoDerEmpalado += 1.0;
-			break;
-		case 'V':
-			angBrazoDerEmpalado -= 3.0;
-			break;
-
-		case 'b':	
-			angBrazoIzqEmpalado += 3.0;
-			break;
-
-		case 'B':	
-			angBrazoIzqEmpalado -= 3.0;
-			break;
-
-		case 'n':	
-			angPiernaDerEmpalado += 3.0 ;
-			break;
-
-		case 'N':	
-			angPiernaDerEmpalado -= 3.0;
-			break;
-
-		case 'm':
-			angPiernaIzqEmpalado += 3.0;
-			break;
-
-		case 'M':
-			angPiernaIzqEmpalado -= 3.0;
+		case 'r':
+			if (recorrido==false)
+				objCamera.Position_Camera(-6 + 250, 4.0f, -5, -6 + 250, 4.0f, 0, 0, 1, 0);
+			recorrido = true;
 			break;
 
 		case 27:        // Cuando Esc es presionado...
