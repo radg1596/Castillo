@@ -2,8 +2,8 @@
 //************************************************************//
 //************************************************************//
 //************** Alumno (s): *********************************//
-//*************	Desiderio Gonzalez Ricardo Abraham		******//
-//*************Gutierrez Benitez David Fernando			******//
+//*************	Desiderio González Ricardo Abraham		******//
+//*************Gutiérrez Bénitez David Fernando			******//
 //************************************************************//
 //************************************************************//
 
@@ -16,7 +16,7 @@
 void monitoCT(GLuint textura);
 
 ///ARCHIVO/////
-FILE *ap,*escribir;
+FILE *ap;
 ////RECORRIDO////
 char c;
 
@@ -373,9 +373,6 @@ void planos_cruzados(GLuint text)
 }
 
 //NEW CASA//////////////////////////////////////
-void DibujaCasa ( void ){
-
-}
 
 void dibujaContornoCasa() {
 	//Paredes y piso de la casa
@@ -1322,165 +1319,6 @@ void prisma(GLuint textura1, GLuint textura2)  //Funcion creacion prisma
 	glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[7]);
 	glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertice[4]);
 	glEnd();
-}
-
-
-
-
-void ropero(void) {
-glPushMatrix();
-	glPushMatrix();
-		glTranslatef(-8, -20, 50);
-		fig5.prisma(50.0, 1.0, 30.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -20, 35);
-		glRotatef(90, 1, 0, 0);
-		fig5.prisma(1.0, 6.0, 50.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -20, 65);
-		glRotatef(90, 1, 0, 0);
-		fig5.prisma(1.0, 6.0, 50.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -20, 57.5);
-		glRotatef(90, 1, 0, 0);
-		fig5.prisma(0.5, 6.0, 50.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -20, 42.5);
-		glRotatef(90, 1, 0, 0);
-		fig5.prisma(0.5, 6.0, 50.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -45, 50);
-		fig5.prisma(0.5, 6.0, 31.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, 5, 50);
-		fig5.prisma(0.5, 6.0, 31.0, textMarble.GLindex);
-	glPopMatrix();
-	
-	glPushMatrix();
-		glTranslatef(-5.5, -20, 50);
-		fig5.prisma(0.5, 6.0, 30.0, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -30, 50);
-		fig5.prisma(0.5, 6.0, 30.0, textMarble.GLindex);
-	glPopMatrix();
-	
-	glPushMatrix();
-		glTranslatef(-5.5, -10, 39);
-		fig5.prisma(0.5, 6.0, 7.5, textMarble.GLindex);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(-5.5, -10, 61);
-		fig5.prisma(0.5, 6.0, 7.5, textMarble.GLindex);
-	glPopMatrix();
-glPopMatrix();
-}
-
-void monito(GLuint textura) //se modifico
-{
-	//glNewList(1, GL_COMPILE);
-	glPushMatrix();//Pecho
-	glScalef(0.5, 0.5, 0.5);
-	fig7.prisma(2.0, 2.0, 1, textura);
-
-	glPushMatrix();//Cuello
-	glTranslatef(0, 1.0, 0.0);
-	fig7.cilindro(0.25, 0.25, 15, textura);
-	glPushMatrix();//Cabeza
-	glTranslatef(0, 1.0, 0);
-	fig7.esfera(0.75, 15, 15, textura);
-	glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Brazo derecho--> //se modifico
-	glTranslatef(1.25, 0.65, 0);
-	fig7.esfera(0.5, 12, 12, textura);
-	glPushMatrix();
-	glTranslatef(0.25, 0, 0);
-	glRotatef(-45 + 0, 0, 1, 0);  //agregado
-	glTranslatef(0.75, 0, 0);
-	fig7.prisma(0.7, 1.5, 0.7, textura);
-	glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix(); //Brazo izquierdo <-- //se modifico
-	glTranslatef(-1.25, 0.65, 0);
-	fig7.esfera(0.5, 12, 12, textura);
-	glPushMatrix();
-	glTranslatef(-0.25, 0, 0);
-	glRotatef(45, 0, 1, 0);
-	//glRotatef(25, 0, 0, 1);
-	glRotatef(25 + 0, 0, 1, 0);  //agregado
-	glTranslatef(-0.75, 0, 0);
-	fig7.prisma(0.7, 1.5, 0.7, textura);
-	glPopMatrix();
-	glPopMatrix();
-
-	glPushMatrix();//Cintura
-	glTranslatef(0, -1.5, 0);
-	fig7.prisma(1, 2, 1, textura);
-
-	glPushMatrix(); //Pie Derecho -->
-	glTranslatef(0.75, -0.5, 0);
-	glRotatef(-15, 1, 0, 0);
-	glTranslatef(0, -0.5, 0);
-	fig7.prisma(1.0, 0.5, 1, textura);
-
-	glPushMatrix();
-	glTranslatef(0, -0.5, 0);
-	glRotatef(15 + 0, 1, 0, 0);
-	glTranslatef(0, -0.75, 0);
-	fig7.prisma(1.5, 0.5, 1, textura);
-
-	glPushMatrix();
-	glTranslatef(0, -0.75, 0.3);
-	fig7.prisma(0.2, 1.2, 1.5, textura);
-	glPopMatrix();
-	glPopMatrix();
-
-	glPopMatrix();
-
-
-	glPushMatrix(); //Pie Izquierdo -->
-	glTranslatef(-0.75, -0.5, 0);
-	glRotatef(-5, 1, 0, 0);
-	glTranslatef(0, -0.5, 0);
-	fig7.prisma(1.0, 0.5, 1, textura);
-
-	glPushMatrix();
-	glTranslatef(0, -0.5, 0);
-	glRotatef(15 + 0, 1, 0, 0);
-	glTranslatef(0, -0.75, 0);
-	fig7.prisma(1.5, 0.5, 1, textura);
-
-	glPushMatrix();
-	glTranslatef(0, -0.75, 0.3);
-	fig7.prisma(0.2, 1.2, 1.5, textura);
-	glPopMatrix();
-	glPopMatrix();
-	glPopMatrix();
-
-
-	glPopMatrix();
-
-
-	glColor3f(1, 1, 1);
-	glPopMatrix();
-
 }
 
 void momia(GLuint textura) //se modifico
@@ -3869,7 +3707,7 @@ int main ( int argc, char** argv )   // Main Function
   glutInitWindowSize  (500, 500);	// Tamaño de la Ventana
   glutInitWindowPosition (0, 0);	//Posicion de la Ventana
   glutCreateWindow    ("Proyecto Final"); // Nombre de la Ventana
- // glutFullScreen     ( );         // Full Screen
+  glutFullScreen     ( );         // Full Screen
   InitGL ();						// Parametros iniciales de la aplicacion
   glutDisplayFunc     ( display );  //Indicamos a Glut función de dibujo
   glutReshapeFunc     ( reshape );	//Indicamos a Glut función en caso de cambio de tamano
