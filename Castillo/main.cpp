@@ -85,7 +85,7 @@ GLfloat m_amb2[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
 GLfloat m_s2[] = {22};
 
 //////DESICIONES IMPORTANTES/////////
-bool terror = true;
+bool terror = false;
 bool puertaAbierta=false;
 bool recorrido = false;
 bool organo =true;
@@ -157,7 +157,8 @@ bool estado3Momia = false;
 bool estado4Momia = false;
 bool estado5Momia = false;
 bool estado6Momia = false;
-//MOMIA TRASLADO
+
+
 ////temp
 bool playfantasma = false;
 bool playGuillotina = false;
@@ -268,7 +269,6 @@ CFiguras fig7;
 
 ///////////////////FIGURAS EN 3D///////////////////
 CModel  fantasma; 
-CModel est;
 
 
 //END NEW//////////////////////////////////////////
@@ -1137,36 +1137,35 @@ void DibujaFantasma() {
 
 void keyboardSimulado(char simkey)  // Create Keyboard Function
 {
+
+	if (objCamera.mPos.x>54 && terror == true && organo == true) {
+		organo = false;
+		PlayBach();
+	}
+
 	switch (simkey) {
 	case 'w':   //Movimientos de camara
-		objCamera.Move_Camera(CAMERASPEED + 0.6);
+		objCamera.Move_Camera(CAMERASPEED + 0.3);
 		break;
-	case 'W':
+	case 'q':
 		objCamera.Move_Camera(CAMERASPEED + 0.6);
 		break;
 
 	case 's':
 	case 'S':
-		objCamera.Move_Camera(-(CAMERASPEED + 0.6));
+		objCamera.Move_Camera(-(CAMERASPEED + 0.3));
 		break;
 
 	case 'a':
 	case 'A':
-		objCamera.Strafe_Camera(-(CAMERASPEED + 0.6));
+		objCamera.Strafe_Camera(-(CAMERASPEED + 0.3));
 		break;
 
 	case 'd':
 	case 'D':
-		objCamera.Strafe_Camera(CAMERASPEED + 0.6);
+		objCamera.Strafe_Camera(CAMERASPEED + 0.3);
 		break;
 
-	case 'k':		//
-	case 'K':
-		if (FrameIndex<MAX_FRAMES)
-		{
-			saveFrame();
-		}
-		break;
 
 	case 'l':
 	case 'L':
@@ -1195,7 +1194,7 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 			texturas_casa_terror();
 			terror = true;
 			PlaySound(NULL, NULL, 0);
-			//PlayMozart();
+			PlayMozart();
 		}
 		//Interaccion puerta
 		if (objCamera.mPos.z >3 && objCamera.mPos.z < 14 && objCamera.mPos.x>10 && objCamera.mPos.x < 19) {
@@ -1214,30 +1213,16 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 		}
 		break;
 
-	case 'x':
-	case 'X':
+	case 'g':
+	case 'G':
 		playGuillotina = true;
 		break;
 
-	case 'c':
-	case 'C':
+	case 'm':
+	case 'M':
+		playMomia = true;
 		break;
 
-	case 'j':
-	case 'J':
-		break;
-
-	case 'b':
-		break;
-
-	case 'B':
-		break;
-
-	case 'p':
-		break;
-
-	case 'P':
-		break;
 
 	case '1':
 		g_lookupdown -= 1.0f;	
@@ -1256,14 +1241,14 @@ void keyboardSimulado(char simkey)  // Create Keyboard Function
 		break;
 
 	case '5':
-		objCamera.UpDown_Camera(CAMERASPEED );
+		objCamera.UpDown_Camera(CAMERASPEED*2 );
 		break;
 
 	case '6':
-		objCamera.UpDown_Camera(-CAMERASPEED );
+		objCamera.UpDown_Camera(-CAMERASPEED*2 );
 		break;
 
-	case 27:        // Cuando Esc es presionado...
+	case 'e':        // Cuando Esc es presionado...
 		exit(0);   // Salimos del programa
 		break;
 	default:        // Cualquier otra
@@ -1983,18 +1968,6 @@ void castillo()
 				monitoEmpalado(textPelo.GLindex);
 			glPopMatrix();
 			
-			//dragones
-			glPushMatrix();
-				glTranslatef(-40.0, 51.0, 20.0);
-				glScalef(0.1, 0.1, 0.1);
-				est.GLrender(NULL, _SHADED, 1.0);  //_WIRED O _POINTS
-			glPopMatrix();
-
-			glPushMatrix();
-				glTranslatef(40.0, 51.0, 20.0);
-				glScalef(0.1, 0.1, 0.1);
-				est.GLrender(NULL, _SHADED, 1.0);  //_WIRED O _POINTS
-			glPopMatrix();
 			
 			//machete
 			glPushMatrix();
@@ -2633,7 +2606,7 @@ void monitoCT(GLuint textura) //se modifico
 		glPopMatrix();
 
 		glPushMatrix();//Cintura
-			glTranslatef(0, -1.5, 0);
+			glTranslatef(0, +-1.5, 0);
 			fig7.prisma(1, 2, 1, textura);
 
 			glPushMatrix(); //Pie Derecho -->
@@ -2926,7 +2899,6 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	///////Modelos 3ds/////////
 	fantasma._3dsLoad("modelos/fantasma.3ds");
-	//est._3dsLoad("modelos/Dragon.3DS");
 
 
 	objCamera.Position_Camera(-6+250, 4.0f,-5, -6+250, 4.0f,0, 0, 1, 0); //Posision inicial de la camara
@@ -3007,7 +2979,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glEnable(GL_LIGHTING);
 			glPopMatrix();	
 
-			///////PASTO_ISLAS////////////
+			/////PASTO_ISLAS////////////
 			glPushMatrix();
 				glDisable(GL_LIGHTING);
 				//glTranslatef(0, 0, 0);
@@ -3020,8 +2992,8 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			//////////CASTILLO/////////
 			if (terror == true) {
 				glPushMatrix();
-					//glTranslatef(490, -6.9, 10);
-					glTranslatef(210, 0, 30);
+					glTranslatef(490, -6.9, 10);
+					//glTranslatef(210, 0, 30);
 					glRotatef(270, 0, 1, 0);
 					castillo();
 				glPopMatrix();
@@ -3171,7 +3143,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 void animacion()
 {
 	///
-	fprintf(escribir, "c");//silencio del teclado
+	//fprintf(escribir, "c");//silencio del teclado
 	if (recorrido == true) {
 		
 		c = fgetc(ap);
@@ -3674,8 +3646,8 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 	//printf("%.2f \n", objCamera.mPos.x);
 	//printf("%.2f \n", objCamera.mPos.y);
 	//printf("%.2f \n", objCamera.mPos.x);
-	printf("%.2f \n", MomiaZ);
-	printf("%.2f \n", giroMomia);
+	//printf("%.2f \n", MomiaZ);
+	//printf("%.2f \n", giroMomia);
 	if (objCamera.mPos.x>54 && terror==true && organo==true) {
 		organo = false;
 		PlayBach();
@@ -3683,29 +3655,29 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
-				objCamera.Move_Camera(CAMERASPEED + 0.6);
-				fprintf(escribir, "w");
+				objCamera.Move_Camera(CAMERASPEED + 0.3);
+				//fprintf(escribir, "w");
 			break;
-		case 'W':
+		case 'q':
 				objCamera.Move_Camera(CAMERASPEED + 0.6);
 			break;
 
 		case 's':
 		case 'S':
-			objCamera.Move_Camera(-(CAMERASPEED+0.6));
-			fprintf(escribir, "s");
+			objCamera.Move_Camera(-(CAMERASPEED+0.3));
+			//fprintf(escribir, "s");
 			break;
 
 		case 'a':
 		case 'A':
-			objCamera.Strafe_Camera(-(CAMERASPEED+0.6));
-			fprintf(escribir, "a");
+			objCamera.Strafe_Camera(-(CAMERASPEED+0.3));
+			//fprintf(escribir, "a");
 			break;
 
 		case 'd':
 		case 'D':
-			objCamera.Strafe_Camera( CAMERASPEED+0.6 );
-			fprintf(escribir, "d");
+			objCamera.Strafe_Camera( CAMERASPEED+0.3 );
+			////fprintf(escribir, "d");
 			break;
 
 		//case 'k':		//
@@ -3718,7 +3690,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'l':						
 		case 'L':
-			fprintf(escribir, "l");
+			//fprintf(escribir, "l");
 			if(play==false && (FrameIndex>1))
 			{
 
@@ -3739,7 +3711,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'z':						
 		case 'Z':
 			//Interaccion regalo
-			fprintf(escribir, "z");
+			//fprintf(escribir, "z");
 			if (objCamera.mPos.z > -7 && objCamera.mPos.z < -1 && objCamera.mPos.x>0 && objCamera.mPos.x<6)
 			{
 				texturas_casa_terror();
@@ -3764,32 +3736,32 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			}
 			break;
 
-		case 'x':						
-		case 'X':
-			fprintf(escribir, "x");
+		case 'm':						
+		case 'M':
 			playMomia = !playMomia;
+			//fprintf(escribir, "m");
 			break;
 
 		case 'c':						
 		case 'C':
-			fprintf(escribir, "c");
+			//fprintf(escribir, "c");
 			break;
 
 		case 'r':
+		case 'R':
 			if (recorrido==false)
 				objCamera.Position_Camera(-6 + 250, 4.0f, -5, -6 + 250, 4.0f, 0, 0, 1, 0);
 			recorrido = true;
 			break;
 
-		case 'v':
+		case 'g':
+		case 'G':
 			playGuillotina = !playGuillotina;
-			break;
-
-		case 'V':
-			giroMomia -= 10.0;
+			//fprintf(escribir, "g");
 			break;
 
 		case 27:        // Cuando Esc es presionado...
+			//fprintf(escribir, "e");
 			exit ( 0 );   // Salimos del programa
 			break;        
 		default:        // Cualquier otra
@@ -3804,34 +3776,35 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
-		objCamera.UpDown_Camera(CAMERASPEED);
-		fprintf(escribir, "5");
+		if (objCamera.mPos.y<500)
+		objCamera.UpDown_Camera(CAMERASPEED*2);
+		//fprintf(escribir, "5");
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		//if (objCamera.mPos.y>3)
-			objCamera.UpDown_Camera(-CAMERASPEED);
-			fprintf(escribir, "6");
+		if (objCamera.mPos.y>3)
+			objCamera.UpDown_Camera(-CAMERASPEED*2);
+			//fprintf(escribir, "6");
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
 		g_lookupdown -= 1.0f;
-		fprintf(escribir, "1");
+		//fprintf(escribir, "1");
 		break;
 
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
 		g_lookupdown += 1.0f;
-		fprintf(escribir, "2");
+		//fprintf(escribir, "2");
 		break;
 
 	case GLUT_KEY_LEFT:
 		objCamera.Rotate_View(-CAMERASPEED);
-		fprintf(escribir, "2");
+		//fprintf(escribir, "2");
 		break;
 
 	case GLUT_KEY_RIGHT:
 		objCamera.Rotate_View( CAMERASPEED);
-		fprintf(escribir, "3");
+		//fprintf(escribir, "3");
 		break;
 
     default:
@@ -3885,7 +3858,7 @@ int main ( int argc, char** argv )   // Main Function
 {
   //Archivo
   ap = fopen("recorrido.txt", "r+");
-  escribir = fopen("escribir.txt", "w+");
+ // escribir = fopen("escribir.txt", "w+");
   int submenu;
   glutInit            (&argc, argv); // Inicializamos OpenGL
   glutInitDisplayMode (GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
@@ -3912,6 +3885,7 @@ int main ( int argc, char** argv )   // Main Function
   glutAttachMenu	  (GLUT_RIGHT_BUTTON);
 
   glutMainLoop        ( );          // 
+  fclose(ap);
 
   return 0;
 }
