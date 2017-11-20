@@ -2975,7 +2975,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glDisable(GL_LIGHTING);
 					glTranslatef(200,1999.5,0);
 					glRotatef(angNubes, 0, 1, 0);
-					fig1.skybox_cielo(1000.0, 4000.0, 1000.0,text1.GLindex, textMar.GLindex, text1.GLindex, 1.0);
+					fig1.skybox_cielo(2000.0, 4000.0, 2000.0,text1.GLindex, textMar.GLindex, text1.GLindex, 1.0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();	
 
@@ -3154,7 +3154,11 @@ void animacion()
 
 	///////*******NUBES*********////////////
 	if (terror == false) {
-		angNubes += 0.01;
+		angNubes += 0.03;
+		if (angNubes >= 360)
+		{
+			angNubes = 0;
+		}
 	}
 		
 
