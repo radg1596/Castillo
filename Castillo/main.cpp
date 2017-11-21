@@ -3699,7 +3699,7 @@ void menu( int id)
 int main ( int argc, char** argv )   // Main Function
 {
   //Archivo
-  ap = fopen("recorrido.txt", "r+");
+  ap = fopen("recorrido.txt", "r");
  // escribir = fopen("escribir.txt", "w+");
   int submenu;
   glutInit            (&argc, argv); // Inicializamos OpenGL
